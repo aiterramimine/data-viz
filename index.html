@@ -56,7 +56,6 @@
         google.maps.event.addListener(map, 'zoom_changed', function() {
             if (map.getZoom() < MIN_ZOOM_LEVEL) {
                 map.setZoom(MIN_ZOOM_LEVEL);
-                console.log('Back to min zoom level');
             }
         });
 
@@ -70,9 +69,11 @@
         d3.json("./datasets/countries.json", function(error, data) {
             d3.json("./datasets/euro2016_players_dataset.json", function(error, euroData) {
                 let goalsPerCountry = nbGoalsPerCountry(euroData);
-
+                
                 if(error) throw error;
-
+                
+                //console.log(specialPlayersPerCountry(euroData));
+                
                 var overlay = new google.maps.OverlayView();
 
                 overlay.onAdd = function() {
@@ -91,12 +92,15 @@
                             .each(transform) // update existing markers
                             .enter()
                             .append("svg")
+                            .attr('fill', 'green');
 
                         // Add a circle.
                         marker.append("circle")
                             .attr("r", (d) => {return ((goalsPerCountry[d.value.name]/100) * MAX_RADIUS) || 0} )
                             .attr("cx", padding)
-                            .attr("cy", padding);
+                            .attr("cy", padding)
+                            .attr('fill', 'yellow')
+                            .each(color);
 
                         function transform(d) {
                             d = new google.maps.LatLng(d.value.latitude, d.value.longitude);
@@ -108,6 +112,12 @@
                                 .style("top", (d.y - padding) + "px")
                                 .style("padding-right", 0 + "px");
 
+                        }
+
+                        function color(d) {
+                            console.log(d.value);
+                            return d3.select(this)
+                                .style('fill', countriesWithThreeBestGoalers.includes(d.value.name) ? 'green' : '');
                         }
 
                         function radius(numGoals) {
@@ -122,13 +132,30 @@
             });
         });
         
-        const reducer = (accumulator, currentValue) => accumulator + +currentValue['goals for country'];
+        let countriesWith3BestGoalers = [];
+        let countriesWithThreeBestGoalers = ['Portugal', 'Ireland', 'Sweden'];
+        const reducer = (accumulator, currentValue) => {
+            if(currentValue['goals for country'] > 52) countriesWith3BestGoalers.push(currentValue['name']);
+            console.log(countriesWith3BestGoalers);
 
+            return accumulator + +currentValue['goals for country'];
+        }
+        
+        const reducerSpecialPlayer = (accumulator, currentValue) => accumulator + (currentValue['special player? (eg. key player, promising talent, etc)'] != '' ? 1 : 0);
+
+        function specialPlayersPerCountry(data) {
+            var dic = {};
+            data.forEach(elem => {
+                dic[capitalizeFirstLetter(Object.keys(elem)[0])] = elem[Object.keys(elem)[0]]['Players'].reduce(reducerSpecialPlayer, 0);
+            });
+            
+            return dic;
+        }
         /* Returns a dictionary of number or goals per country. */
         function nbGoalsPerCountry(data) {
             var dic = {};
             data.forEach(elem => {
-                dic[capitalizeFirstLetter(Object.keys(elem)[0])] =elem[Object.keys(elem)[0]]['Players'].reduce(reducer, 0) / 2.09;
+                dic[capitalizeFirstLetter(Object.keys(elem)[0])] = elem[Object.keys(elem)[0]]['Players'].reduce(reducer, 0) / 2.09;
             });
 
             return dic;
@@ -137,6 +164,7 @@
         function capitalizeFirstLetter(string) {
             return string.charAt(0).toUpperCase() + string.slice(1);
         }
+
         
 
         
