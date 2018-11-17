@@ -69,8 +69,8 @@
         });
 
         d3.json("./datasets/countries.json", function(error, data) {
-            d3.json("./datasets/euro2016_players_dataset.json", function(error, data2) {
-
+            d3.json("./datasets/euro2016_players_dataset.json", function(error, euroData) {
+                console.log(nbGoalsPerCountry(euroData));
                 if(error) throw error;
 
                 var overlay = new google.maps.OverlayView();
@@ -121,6 +121,19 @@
 
             });
         });
+        
+        const reducer = (accumulator, currentValue) => accumulator + +currentValue['goals for country'];
+
+        /* Returns a dictionary of number or goals per country. */
+        function nbGoalsPerCountry(data) {
+            var dic = {};
+            data.forEach(elem => {
+                dic[Object.keys(elem)[0]] =elem[Object.keys(elem)[0]]['Players'].reduce(reducer, 0);
+            });
+
+            return dic;
+        }
+        
 
         
 
