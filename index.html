@@ -15,8 +15,7 @@
     <script>
 
         const MIN_ZOOM_LEVEL = 5;
-        const MIN_RADIUS = 4;
-        const MAX_RADIUS = 30;
+        const MAX_RADIUS = 45;
 
         var map = new google.maps.Map(
             d3.select('#map').node(),
@@ -70,7 +69,8 @@
 
         d3.json("./datasets/countries.json", function(error, data) {
             d3.json("./datasets/euro2016_players_dataset.json", function(error, euroData) {
-                console.log(nbGoalsPerCountry(euroData));
+                let goalsPerCountry = nbGoalsPerCountry(euroData);
+
                 if(error) throw error;
 
                 var overlay = new google.maps.OverlayView();
@@ -84,7 +84,7 @@
                     // We could use a single SVG, but what size would it have?
                     overlay.draw = function() {
                         var projection = this.getProjection(),
-                            padding = 40;
+                            padding = 55;
 
                         var marker = layer.selectAll("svg")
                             .data(d3.entries(data))
@@ -94,7 +94,7 @@
 
                         // Add a circle.
                         marker.append("circle")
-                            .attr("r", radius)
+                            .attr("r", (d) => {return ((goalsPerCountry[d.value.name]/100) * MAX_RADIUS) || 0} )
                             .attr("cx", padding)
                             .attr("cy", padding);
 
@@ -128,10 +128,14 @@
         function nbGoalsPerCountry(data) {
             var dic = {};
             data.forEach(elem => {
-                dic[Object.keys(elem)[0]] =elem[Object.keys(elem)[0]]['Players'].reduce(reducer, 0);
+                dic[capitalizeFirstLetter(Object.keys(elem)[0])] =elem[Object.keys(elem)[0]]['Players'].reduce(reducer, 0) / 2.09;
             });
 
             return dic;
+        }
+
+        function capitalizeFirstLetter(string) {
+            return string.charAt(0).toUpperCase() + string.slice(1);
         }
         
 
