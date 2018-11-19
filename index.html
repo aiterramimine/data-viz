@@ -77,15 +77,18 @@
                 var overlay = new google.maps.OverlayView();
 
                 overlay.onAdd = function() {
-                    var layer = d3.select(this.getPanes().overlayLayer).append("div")
-                        .attr("class", "stations");
+
+                    var selectedCountry = null;
+
+                    var layer = d3.select(this.getPanes().overlayMouseTarget).append("div")
+                        .attr("class", "stations")
                     
                     //console.log(data);
                     // Draw each marker as a separate SVG element.
                     // We could use a single SVG, but what size would it have?
                     overlay.draw = function() {
                         var projection = this.getProjection(),
-                            padding = 55;
+                            padding = 50;
 
                         var marker = layer.selectAll("svg")
                             .data(d3.entries(data))
@@ -100,6 +103,8 @@
                             .attr("cx", padding)
                             .attr("cy", padding)
                             .attr('fill', 'yellow')
+                            .style("stroke-width", '0px')
+                            .on('click', handleMouseOver)
                             .each(color);
 
                         function transform(d) {
@@ -111,6 +116,17 @@
                                 .style("height", "100px")
                                 .style("top", (d.y - padding) + "px")
                                 .style("padding-right", 0 + "px");
+
+                        }
+                        
+                        function handleMouseOver(d, i) {
+                            console.log('Mouse over detected !!');
+                            if(selectedCountry) {
+                                d3.select(selectedCountry).style("stroke-width", '0px');
+                            }
+                            d3.select(this).style("stroke-width", '3px');
+
+                            selectedCountry = this;
 
                         }
 
@@ -151,6 +167,7 @@
             
             return dic;
         }
+
         /* Returns a dictionary of number or goals per country. */
         function nbGoalsPerCountry(data) {
             var dic = {};
