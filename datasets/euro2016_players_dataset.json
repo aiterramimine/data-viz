@@ -374,6 +374,7 @@
       },
       {
           "belgium": {
+              "rank": 5,
               "Players": [{
                   "name": "Thibaut Courtois",
                   "bio": "Despite a stop-start season for Chelsea that began with his red card in the opening day draw with Swansea back in August, Courtois remains the undisputed No1 for coach Marc Wilmots. However, for a career that seemed to be heading in only one direction until then, there is a sense that he needs to improve if Belgium are to fulfil their status as one of the pre-tournament favourites. At just 24, though, Courtois has plenty of time on his side.",
@@ -748,6 +749,7 @@
   
       {
           "croatia": {
+              "rank": 12,
               "Players": [{
                   "name": "Danijel Subašić",
                   "bio": "Monaco’s keeper finally became first choice for Croatia after the 2014 World Cup, having been stuck behind/served as a loyal stand-in for No1 Stipe Pletikosa for years. Mentally strong with great reflexes, he’s reliable and commanding, and has a nifty party piece: the ability to jog upfield and score from direct free-kicks. His fizzed belter from the edge of the box against Boulogne in 2012 was an instant YouTube classic.",
@@ -1496,6 +1498,7 @@
   
       {
           "england": {
+              "rank": 10,
               "Players": [{
                   "name": "Fraser Forster",
                   "bio": "A man-mountain who has been elevated to second-choice in the absence of the injured Jack Butland. Excellent for Southampton now he has recovered from a lengthy knee injury, he was unused at the 2014 World Cup but has proved reliable when called upon.",
@@ -1870,6 +1873,7 @@
   
       {
           "france": {
+              "rank": 2,
               "Players": [{
                   "name": "Hugo Lloris",
                   "bio": "The Tottenham player has been his country's No1 since 2009 even though a foul against Serbia that year led to him becoming the first goalkeeper to be sent off for France. Laurent Blanc made him captain in 2010, a decision that Didier Deschamps has endorsed.",
@@ -2244,6 +2248,7 @@
   
       {
           "germany": {
+              "rank": 3,
               "Players": [{
                   "name": "Manuel Neuer",
                   "bio": "One of the best goalkeepers in the world, Neuer led from the back as Germany became world champions two years ago. Likes to play as a sweeper, just like Hugo Lloris does for Tottenham Hotspur and France, and is very comfortable with the ball at his feet. There have been high-profile mistakes, against Borussia Mönchengladbach and Arsenal to name two games, but he is still the undisputed No1 for club and country. Neuer was given his first ball at the age of two and joined Schalke three years later. Grew up with Jens Lehmann as his hero and loves heavy metal, which he often listens to before games. “With AC/DC I cool myself down and I won't risk a red card so that I weaken my team's chances to win the game. The last man must always project strength and that is what I try to do.\"",
@@ -2618,6 +2623,7 @@
   
       {
           "hungary": {
+              "rank": 16,
               "Players": [{
                   "name": "Gábor Király",
                   "bio": "40 years old and still going strong in his trademark tracksuit bottoms. He has fond memories of group opponents Austria where his first touch in the national team – a few goal kicks aside – was saving a penalty against them in 1998. Played 104 games for Crystal Palace from 2004, and also had spells at West Ham, Villa, Burnley and Fulham. Returned to Hungary with Haladás last year. He won his 100th Hungary cap in a 1-0 win away to Norway in their 2016 qualifying play-off first-leg.",
@@ -2992,6 +2998,7 @@
   
       {
           "iceland": {
+              "rank": 8,
               "Players": [{
                   "name": "Hannes Thór Halldórsson",
                   "bio": "Film director who played part-time for Icelandic clubs until 2014, when he gave it up to sign his first professional deal in Norway. Directed the video for Iceland’s entry in the Eurovision song contest in 2012 – Greta Salóme & Jónsi finished 20th with “Never Forget”. He first represented Iceland in 2011 aged 27, and consolidated his position in the 2016 qualifiers. Spent part of last season on loan at Bodø/Glimt.",
@@ -3366,6 +3373,7 @@
   
       {
           "ireland": {
+              "rank": 13,
               "Players": [{
                   "name": "Aiden McGeady",
                   "bio": "Glasgow-born winger, who worked under Martin O'Neill at Celtic, he fell from favour at Everton this season and moved on loan to Sheffield Wednesday in February, in order to gain regular minutes. Scored both goals in the 2-1 qualifying win in Georgia, including a 90th minute winner.",
@@ -3740,6 +3748,7 @@
   
       {
           "italy": {
+              "rank": 7,
               "Players": [{
                   "name": "Gianluigi Buffon",
                   "bio": "Now 38, Italy’s most capped player shows no signs of slowing down, having just had one of the best seasons of his career, during which he set a new all-time Serie A record by not conceding for 974 minutes. Buffon is also his country's most capped player with a staggering 156 appearances for the Azzurri. It is difficult to think that he was low on confidence and battling depression in 2003 when he was already a star for Juventus. \"To the fans it does not matter a damn how you are,” he said years later when he was ready to talk about it. “You are seen as the footballer, the idol, so no one thinks to stop and ask you: 'Hey, how are you?'\" Wrote a lovely open letter to the goal he defends in 2016. \"I was 12 when I turned my back on you, denying my past to guarantee you a safe future. I went with my heart. I went with my instinct,” it started.",
@@ -4114,6 +4123,7 @@
   
       {
           "northern-ireland": {
+              "rank": 14,
               "Players": [{
                   "name": "Michael McGovern",
                   "bio": "Replaced Roy Carroll, his fellow Enniskillen-born keeper, during the Euro qualifying campaign but his hold on the number one spot faltered after an almost-costly slip against Hungary. Was otherwise assured for O’Neill’s team as he made up for lost time having endured a five-year wait from 2010 to win his second cap.",
@@ -4488,6 +4498,7 @@
   
       {
           "poland": {
+              "rank": 6,
               "Players": [{
                   "name": "Lukasz Fabianski",
                   "bio": "For seven years he played second fiddle at Arsenal, first to Jens Lehmann and then to Wojciech Szczesny. The thought was that the 31-year-old lacked the ambition to be a No1, but he proved the doubters wrong by moving to Swansea, where he has not disappointed, missing just one game in two seasons. It is a similar story with the national team – Fabianski took over from Szczesny in 2015 for the game against the Republic of Ireland in Dublin. He helped Poland secure a point and has not looked back.",
@@ -4885,6 +4896,7 @@
   
       {
           "portugal": {
+              "rank": 1,
               "Players": [{
                   "name": "Rui Patricio ",
                   "bio": "The 28-year-old will be hoping his Euro 2016 experience is better than his World Cup in Brazil two years ago when Germany thrashed Portugal 4-0 in the opener: he picked up an injury and was not seen again. The No1 at Sporting Lisbon since his teenage years, Patricio has long been linked with a number of goalkeeper-hungry Premier League clubs, Liverpool among them. He shrugged off the speculation last year. “I only think day by day. I don’t make plans. I live one day at a time.”",
@@ -6007,6 +6019,7 @@
   
       {
           "slovakia": {
+              "rank": 15,
               "Players": [{
                   "name": "Ján Mucha",
                   "bio": "A veteran now, the goalkeeper was a regular under the previous coach, Vladimír Weiss Sr, and produced a stunning performance against Poland in snowy Chorzów to take Slovakia to the 2010 World Cup. However, after his move to Everton, where he failed to dislodge Tim Howard as the No1 goalkeeper, as well as a couple of mistakes while playing for Slovakia, he lost his place to Kozáčik. While at Everton, he admitted living in a “very insular world” and was ordered to do 250 hours of unpaid work after driving while disqualified. Back in Slovakia Mucha has headed a campaign to promote the importance of bone marrow donations as his son has battled with cancer.",
@@ -6381,6 +6394,7 @@
   
       {
           "spain": {
+              "rank": 9,
               "Players": [{
                   "name": "Iker Casillas",
                   "bio": "Once known as The Saint in Spain – now seen as more of a normal human being. His decline was hastened by his confrontation with José Mourinho and his subsequent departure from Real Madrid, and his form has been mixed for Porto. But his inclusion still seems beyond question for Vicente del Bosque. Famously likeable and down to earth, and known for honouring his birthplace with the line: “I'm no Galáctico, I'm from Móstoles.” When he was seven his dad celebrated winning the pools - worth about £1m - until discovering Iker had forgotten to hand his coupon in at the shop. Iker said in 2004: “He doesn’t talk about it much any more.”",
@@ -7129,6 +7143,7 @@
   
       {
           "swiss": {
+              "rank": 11,
               "Players": [{
                   "name": "Roman Bürki",
                   "bio": "His father Martin – who was a goalkeeper in the 1980s – once kept a clean sheet for 772 consecutive minutes. It is a record that Roman is yet to match, but he played in the Champions League qualifiers with Young Boys when he was 19 and has been part of the Switzerland squad since 2013. Travelled to the 2014 World Cup but did not play. Joined Borussia Dortmund in the summer of 2015.",
@@ -8251,6 +8266,7 @@
   
       {
           "wales": {
+              "rank": 4,
               "Players": [{
                   "name": "Wayne Hennessey",
                   "bio": "Born in Anglesey, Hennessey grew up supporting Everton and idolising Neville Southall, the former Goodison Park and Wales goalkeeper. A trainee with Manchester City, he made his competitive debut for Wales in June 2007 against the Czech Republic in a 0-0 draw that marked the end of Ryan Giggs’s international career. Hennessey has suffered some terrible bad luck with injuries and spent 16 months on the sidelines at Wolverhampton Wanderers following two cruciate ligament injuries. After returning to international football in October 2013 while on loan at Yeovil, he joined Crystal Palace in January 2014 and established himself as their No1 in 2015-16. Not always a fans’ favourite at Selhurst Park but, crucially, has Alan Pardew’s backing.",
