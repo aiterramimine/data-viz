@@ -28,8 +28,8 @@
             */
 
             document.addEventListener("DOMContentLoaded", () => {
-                const cloud = new Histogram("#test", "./datasets/euro2016_players_dataset.json", "./datasets/fifa18dataset.json", 1000, 1000);
-                cloud.draw();                
+                const histo = new Histogram("#test", "./datasets/euro2016_players_dataset.json", "./datasets/fifa18dataset.json", 1000, 1000);
+                histo.draw();                
             });
 
             class Histogram {
@@ -91,6 +91,15 @@
 
                                                 // Add the player value to its team total value
                                                 country[countryName]["totalValue"] += val
+
+                                                // Add the player value to the total of his category
+                                                let category = "value"+player["position"]+"s"
+                                                if (country[countryName][category] == undefined) {
+                                                    country[countryName][category] = val
+                                                } else {
+                                                    country[countryName][category] += val
+                                                }
+
                                                 return true;
                                             }
                                         })
