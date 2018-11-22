@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="fr">
+    <head>
+        <meta charset="utf-8">
+        <title>D3 Test</title>
+        <script src="https://d3js.org/d3.v5.js"></script>
+    </head>
+    <body>
+
+        <svg id="test"></svg>
+        <script type="text/javascript">
+           
+           /*
+            //Width and height
+            var w = 800;
+            var h = 400;
+            var padding = 20;
+            var border=1;
+            var bordercolor='black';
+
+            //Create SVG element
+            var svg = ct("body")
+                        .append("svg")
+                        .attr("width", w)
+                        .attr("height", h)
+                        .attr("border",border)
+                        ;
+            */
+
+            document.addEventListener("DOMContentLoaded", () => {
+                const cloud = new Histogram("#test", "./datasets/euro2016_players_dataset.json", "./datasets/fifa18dataset.json", 1000, 1000);
+                cloud.draw();                
+            });
+
+            class Histogram {
+
+                constructor(id, datasetEuro, datasetFifa, width, height) {
+                    this.datasetEuro = datasetEuro
+                    this.datasetFifa = datasetFifa
+                    this.id = id
+                    this.width = width
+                    this.height = height
+                    this.svg = d3.select(this.id).attr("width", this.width).attr("height", this.height)
+                    
+                    // The countries array is filled with null and will be later filled with the teams according to their rank
+                    // 1st on index 0, 2nd on index 1 etc...
+                    this.countries = Array(16).fill(null)
+                
+                }
+
+                draw() {
+                    // Retrieve the fifa dataset infos
+                    d3.json(this.datasetFifa).then(fifaPlayers => {
+                        //Retrieve the euro dataset infos
+                        d3.json(this.datasetEuro).then(euro => {
+                            euro.forEach(country => {  
+                                let countryName = Object.keys(country)[0] 
+                                let rank = country[countryName]["rank"]
+                                if (rank !== undefined) {
+                                    country[countryName]["totalValue"] = 0
+
+                                    this.countries[rank-1] = country
+
+                                    country[countryName]["Players"].forEach(player => {
+                                        let researchName = player["name"].split(' ')[player["name"].split(' ').length - 1]
+                                        //console.log(player["name"] + " | "+ researchName)
+                                        
+                                        // Find the current player of the euro dataset in the fifa dataset
+                                        // ToDO : Enhance the search, for now it stops when finding a player with the same second name.
+                                        //        We should check if several players have the same second name, then choose which one to pick according to his first name and nationality if needed
+                                        fifaPlayers.some(function(fifaPlayer) {
+                                            if (fifaPlayer["Name"].split(' ')[fifaPlayer["Name"].split(' ').length - 1] === researchName) {
+                                                let val = fifaPlayer["Value"].replace('€','')
+                                                // console.log(val)
+
+                                                //The value always contains € at the beginning and M or K at the end
+                                                if (val.indexOf("M") > -1) {
+                                                    val.replace("M","")
+                                                    val = parseInt(val) * 1000000
+                                                } else if (val.indexOf("K") > -1) {
+                                                    val.replace("K","")
+                                                    val = parseInt(val) * 1000
+                                                } else {
+                                                    //Do nothing
+                                                }
+
+                                                //ToDo : remove later, for test purpose only. Checks if a player has no value
+                                                if (val == 0) {
+                                                    console.log(player["name"])
+                                                }
+
+                                                // Add the player value to its team total value
+                                                country[countryName]["totalValue"] += val
+                                                return true;
+                                            }
+                                        })
+                                    })
+                                }
+                            })
+                            console.log(this.countries)
+                        })
+                    })
+                }
+
+                getPos(name) {
+                    let pos = [];
+                    let person = this.data.persons.find(p => p.name === name);
+                    pos.push(person.position.x);
+                    pos.push(person.position.y);
+                    return pos;      
+                }
+
+            }
+
+        </script>
+    </body>
+</html>
