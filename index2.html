@@ -4,31 +4,24 @@
         <meta charset="utf-8">
         <title>D3 Test</title>
         <script src="https://d3js.org/d3.v5.js"></script>
-    </head>
+        <script src="https://d3js.org/d3-random.v1.min.js"></script>
+    </head
+    ><style>
+        .bar {
+          fill: steelblue;
+        }
+    
+        .bar:hover {
+          fill: brown;
+        }
+    </style>
     <body>
 
         <svg id="test"></svg>
         <script type="text/javascript">
-           
-           /*
-            //Width and height
-            var w = 800;
-            var h = 400;
-            var padding = 20;
-            var border=1;
-            var bordercolor='black';
-
-            //Create SVG element
-            var svg = ct("body")
-                        .append("svg")
-                        .attr("width", w)
-                        .attr("height", h)
-                        .attr("border",border)
-                        ;
-            */
 
             document.addEventListener("DOMContentLoaded", () => {
-                const histo = new Histogram("#test", "./datasets/euro2016_players_dataset.json", "./datasets/fifa18dataset.json", 1000, 1000);
+                const histo = new Histogram("#test", "./datasets/euro2016_players_dataset.json", "./datasets/fifa18dataset.json", 1400, 500);
                 histo.draw();                
             });
 
@@ -49,13 +42,37 @@
                 }
 
                 draw() {
+
+                    let svg = d3.select("svg"),
+                    margin = {
+                        top: 20,
+                        right: 20,
+                        bottom: 30,
+                        left: 150
+                    },
+                    width = +svg.attr("width") - margin.left - margin.right,
+                    height = +svg.attr("height") - margin.top - margin.bottom,
+                    g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+                    let parseTime = d3.timeParse("%d-%b-%y");
+
+                    let x = d3.scaleBand()
+                        .rangeRound([0, width])
+                        .padding(0.1);
+
+                    let y = d3.scaleLinear()
+                        .rangeRound([height, 0]);
+
                     // Retrieve the fifa dataset infos
                     d3.json(this.datasetFifa).then(fifaPlayers => {
                         //Retrieve the euro dataset infos
                         d3.json(this.datasetEuro).then(euro => {
+
                             euro.forEach(country => {  
                                 let countryName = Object.keys(country)[0] 
                                 let rank = country[countryName]["rank"]
+
+                                // We only treat top 16 teams
                                 if (rank !== undefined) {
                                     country[countryName]["totalValue"] = 0
 
@@ -106,7 +123,46 @@
                                     })
                                 }
                             })
-                            console.log(this.countries)
+                            //console.log(this.countries)
+
+                            x.domain(this.countries.map(function (d) {
+                                return Object.keys(d)[0]
+                            }));
+
+
+                            y.domain([0, d3.max(this.countries, function (country) {
+                                console.log( country[Object.keys(country)[0]]["totalValue"])
+                                return country[Object.keys(country)[0]]["totalValue"]
+                            })]);
+
+                            g.append("g")
+                                .attr("transform", "translate(0," + height + ")")
+                                .call(d3.axisBottom(x))
+
+                            g.append("g")
+                                .call(d3.axisLeft(y))
+                                .append("text")
+                                .attr("fill", "#000")
+                                .attr("transform", "rotate(-90)")
+                                .attr("y", 6)
+                                .attr("dy", "0.71em")
+                                .attr("text-anchor", "end")
+                                .text("Value");
+
+                            g.selectAll(".bar")
+                                .data(this.countries)
+                                .enter().append("rect")
+                                .attr("class", "bar")
+                                .attr("x", function (country) {
+                                    return x(Object.keys(country));
+                                })
+                                .attr("y", function (country) {
+                                    return y(country[Object.keys(country)[0]]["totalValue"]);
+                                })
+                                .attr("width", x.bandwidth())
+                                .attr("height", function (country) {
+                                    return height - y(country[Object.keys(country)[0]]["totalValue"]);
+                            });
                         })
                     })
                 }
