@@ -3,13 +3,16 @@
     <head>
         
         <link rel="stylesheet" type="text/css" href="style.css">
-        <div id="map"></div>
         <script src = "https://d3js.org/d3.v4.min.js"></script>
         <script src="http://maps.google.com/maps/api/js?"></script>
     </head>
 
     <body>
-        Hello world !
+        <div id="map"></div>
+
+        <div id="side-bar">
+            Select a country to visualize its players
+        </div>
     </body>
 
     <script>
@@ -69,11 +72,9 @@
         d3.json("./datasets/countries.json", function(error, data) {
             d3.json("./datasets/euro2016_players_dataset.json", function(error, euroData) {
                 let goalsPerCountry = nbGoalsPerCountry(euroData);
-                
+
                 if(error) throw error;
-                
-                //console.log(specialPlayersPerCountry(euroData));
-                
+                                
                 var overlay = new google.maps.OverlayView();
 
                 overlay.onAdd = function() {
@@ -83,28 +84,24 @@
                     var layer = d3.select(this.getPanes().overlayMouseTarget).append("div")
                         .attr("class", "stations")
                     
-                    //console.log(data);
-                    // Draw each marker as a separate SVG element.
-                    // We could use a single SVG, but what size would it have?
                     overlay.draw = function() {
                         var projection = this.getProjection(),
                             padding = 50;
 
                         var marker = layer.selectAll("svg")
                             .data(d3.entries(data))
-                            .each(transform) // update existing markers
+                            .each(transform)
                             .enter()
                             .append("svg")
                             .attr('fill', 'green');
 
-                        // Add a circle.
                         marker.append("circle")
                             .attr("r", (d) => {return ((goalsPerCountry[d.value.name]/100) * MAX_RADIUS) || 0} )
                             .attr("cx", padding)
                             .attr("cy", padding)
                             .attr('fill', 'yellow')
                             .style("stroke-width", '0px')
-                            .on('click', handleMouseOver)
+                            .on('click', handleClick)
                             .each(color);
 
                         function transform(d) {
@@ -119,19 +116,19 @@
 
                         }
                         
-                        function handleMouseOver(d, i) {
-                            console.log('Mouse over detected !!');
+                        function handleClick(d, i) {
                             if(selectedCountry) {
                                 d3.select(selectedCountry).style("stroke-width", '0px');
                             }
                             d3.select(this).style("stroke-width", '3px');
 
                             selectedCountry = this;
+                            //getPlayersPerCountry(d.value.name, euroData);
+                            setUpSideBar(d.value.name, euroData);
 
                         }
 
                         function color(d) {
-                            console.log(d.value);
                             return d3.select(this)
                                 .style('fill', countriesWithThreeBestGoalers.includes(d.value.name) ? 'green' : '');
                         }
@@ -142,7 +139,6 @@
                     };
                 };
 
-                // Bind our overlay to the map…
                 overlay.setMap(map);
 
             });
@@ -152,23 +148,12 @@
         let countriesWithThreeBestGoalers = ['Portugal', 'Ireland', 'Sweden'];
         const reducer = (accumulator, currentValue) => {
             if(currentValue['goals for country'] > 52) countriesWith3BestGoalers.push(currentValue['name']);
-            console.log(countriesWith3BestGoalers);
 
             return accumulator + +currentValue['goals for country'];
         }
         
         const reducerSpecialPlayer = (accumulator, currentValue) => accumulator + (currentValue['special player? (eg. key player, promising talent, etc)'] != '' ? 1 : 0);
 
-        function specialPlayersPerCountry(data) {
-            var dic = {};
-            data.forEach(elem => {
-                dic[capitalizeFirstLetter(Object.keys(elem)[0])] = elem[Object.keys(elem)[0]]['Players'].reduce(reducerSpecialPlayer, 0);
-            });
-            
-            return dic;
-        }
-
-        /* Returns a dictionary of number or goals per country. */
         function nbGoalsPerCountry(data) {
             var dic = {};
             data.forEach(elem => {
@@ -181,10 +166,48 @@
         function capitalizeFirstLetter(string) {
             return string.charAt(0).toUpperCase() + string.slice(1);
         }
-
         
+        function getPlayersPerCountry(countryName, dataSet) {
+            ret = [];
+            for(element of dataSet) {
+                countryName = countryName.charAt(0).toLowerCase() + countryName.slice(1);
+                //console.log(Object.keys(element));
+                if(Object.keys(element) == countryName) {
+                    ret = element[countryName].Players;
+                }
+            }
+            ret.sort((a, b) => b['goals for country'] - a['goals for country']);
+            //console.log(ret);
+            totalGoalsPlayers(ret);
+            return ret;
+        }
 
+        let reducerNbGoals = (accumulator, currentValue) => accumulator + +currentValue['goals for country'];
+
+        function totalGoalsPlayers(players) {
+            let totalGoals = players.reduce(reducerNbGoals, 0);
+
+            return totalGoals;
+        }
         
+        function setUpSideBar(countryName, dataSet) {
+            let bar = document.querySelector('#side-bar');
+            bar.innerHTML = countryName;
+            bar.style.backgroundColor = '#ed5050';
+            let players = getPlayersPerCountry(countryName, dataSet);
+            
+            for(player of players) {
+                let percentage = (player['goals for country'] * 100) / totalGoalsPlayers(players);
+               // console.log((player['goals for country'] * 100) / totalGoalsPlayers(players));
+               let elem = document.createElement('div');
+               if(percentage > 1.5) elem.innerHTML = player['goals for country'] + ' - ' + player['name'] + ' - ' + player['club'];
+               elem.style.height = percentage + "%";
+               elem.style.marginBottom = "1px";
+               elem.style.backgroundColor = "#37d693";
+               bar.appendChild(elem);
+            }
+
+        }
 
     </script>
 </html>
