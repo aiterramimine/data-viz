@@ -86,9 +86,10 @@
                                         // ToDO : Enhance the search, for now it stops when finding a player with the same second name.
                                         //        We should check if several players have the same second name, then choose which one to pick according to his first name and nationality if needed
                                         fifaPlayers.some(function(fifaPlayer) {
-                                            if (fifaPlayer["Name"].split(' ')[fifaPlayer["Name"].split(' ').length - 1] === researchName) {
+                                            if (fifaPlayer["Name"].split(' ')[fifaPlayer["Name"].split(' ').length - 1] === researchName  &&
+                                                fifaPlayer["Nationality"].toLowerCase() === countryName)
+                                            {
                                                 let val = fifaPlayer["Value"].replace('€','')
-                                                // console.log(val)
 
                                                 //The value always contains € at the beginning and M or K at the end
                                                 if (val.indexOf("M") > -1) {
