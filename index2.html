@@ -8,11 +8,16 @@
     </head
     ><style>
         .bar {
-          fill: steelblue;
+          fill: #7b6888;
+        }
+
+        .side-bar {
+            text-align: center;
+            text-decoration: blueviolet;
         }
     
         .bar:hover {
-          fill: brown;
+          fill: rgb(126, 65, 126);
           cursor: pointer;
         }
 
@@ -43,18 +48,36 @@
             top: 100%;
             left: 0;
         }
+
+        #pie-chart {
+            position: absolute;
+            top: 410px;
+            width: 40%;
+            left: 10%;
+        }
+
+        #side-bar {
+            position: absolute;
+            width: 48%;
+            right: 1%;
+        }
     </style>
     <body>
 
         <svg id="test"></svg>
         <div id="pie-chart"></div>
+        <div id="side-bar">
+            Select a country to visualize its players
+        </div>
         <script type="text/javascript">
 
             document.addEventListener("DOMContentLoaded", () => {
-                const histo = new Histogram("#test", "./datasets/euro2016_players_dataset.json", "./datasets/fifa18dataset.json", 1400, 500);
+                const histo = new Histogram("#test", "./datasets/euro2016_players_dataset.json", "./datasets/fifa18dataset.json", 1400, 400);
                 histo.draw()
                    
             });
+
+            var selectedCountry = null;
 
             class Histogram {
 
@@ -77,7 +100,7 @@
 
                     let svg = d3.select("svg"),
                     margin = {
-                        top: 50,
+                        top: 40,
                         right: 20,
                         bottom: 30,
                         left: 150
@@ -150,6 +173,9 @@
 
                                                 // Add the player value to his team total value
                                                 country[countryName]["totalValue"] += val
+                                                
+                                                player["value"] = val
+                                                console.log(player)                  
 
                                                 // Add the player value to the total of his category
                                                 let category = "value"+player["position"]+"s"
@@ -226,9 +252,63 @@
 
                 clickOnBar(data) {
                     this.pie.changeData(data)
+
+                    console.log(data)
+                    console.log(Object.keys(data)[0])
+                    selectedCountry = Object.keys(data)[0]
+                    if(selectedCountry){
+                        d3.select(selectedCountry).style("stoke-width", '0px');
+                    }
+                    d3.select(selectedCountry).style("stoke-width", '3px');
+
+                    setUpSideBar(selectedCountry, data);
                 }
 
             }
+
+            function setUpSideBar(countryName, dataSet) {
+            let bar = document.querySelector('#side-bar');
+            bar.innerHTML = countryName;
+            bar.style.backgroundColor = '#ed5050';
+            
+            for(player of dataSet[countryName]['Players']) {
+                let percentage = (player["value"] * 100) / dataSet[countryName]['totalValue'];
+                console.log(player["name"] + " " + percentage)
+               let elem = document.createElement('div');
+               if(percentage > 0.1) elem.innerHTML = player['name'] + ' - ' + player['value'] + ' - ' + player['club'];
+               elem.style.height = percentage + "%";
+               elem.style.marginBottom = "1px";
+               elem.style.backgroundColor = "#37d693";
+               elem.style.color = "white"
+               bar.appendChild(elem);
+            }
+
+        }
+
+        function getPlayersPerCountry(countryName, dataSet) {
+            ret = [];
+            prices = [];
+            for(element of dataSet) {
+                countryName = countryName.charAt(0).toLowerCase() + countryName.slice(1);
+                //console.log(Object.keys(element));
+                if(Object.keys(element) == countryName) {
+                    ret = element[countryName].Players;
+                }
+            }
+            ret.sort((a, b) => b['price'] - a['price']);
+            //console.log(ret);
+            totalGoalsPlayers(ret);
+            return retx;
+        }
+
+        let reducerPrice = (accumulator, currentValue) => accumulator + +currentValue['Value'];
+
+        function pricePlayers(players) {
+            let prices = []
+            for(element of players){
+                prices.append(element['Value']);
+            }
+        }
 
             class PieChart {
                 constructor() {
@@ -241,9 +321,9 @@
 
                     d3.select("#pie").remove();
                     
-                    const width = 500;
-                    const height = 500;
-                    const radius = Math.min(width, height) / 2;
+                    const width = 700;
+                    const height = 350;
+                    const radius = Math.min(width/2, height) / 2;
 
                     const svg = d3.select("#pie-chart")
                         .append("svg")
@@ -251,7 +331,7 @@
                             .attr("height", height)
                             .attr("id", "pie")
                         .append("g")
-                            .attr("transform", `translate(${width / 2}, ${height / 2})`);
+                            .attr("transform", `translate(${width / 4}, ${height / 2})`);
 
                     const color = d3.scaleOrdinal(d3.schemeCategory10);
 
@@ -284,9 +364,60 @@
                         .attr("stroke-width", "6px")
                         .each(function(d) { this._current = d; });
 
+                    path.enter().append("text")
+                        .attr("transform", function(d) { 
+                            return "translate(" + ( (radius - 12) * Math.sin( ((d.endAngle - d.startAngle) / 2) + d.startAngle ) / 2 ) + "," + ( -1 * (radius - 12) * Math.cos( ((d.endAngle - d.startAngle) / 2) + d.startAngle ) /2 ) + ")"; })
+                        .attr("dy", ".35em")
+                        .style("text-anchor", function(d) {
+                            var rads = ((d.endAngle - d.startAngle) / 2) + d.startAngle;
+                            if ( (rads > 7 * Math.PI / 4 && rads < Math.PI / 4) || (rads > 3 * Math.PI / 4 && rads < 5 * Math.PI / 4) ) {
+                                return "middle";
+                            } else if (rads >= Math.PI / 4 && rads <= 3 * Math.PI / 4) {
+                                return "start";
+                            } else if (rads >= 5 * Math.PI / 4 && rads <= 7 * Math.PI / 4) {
+                                return "end";
+                            } else {
+                                return "middle";
+                            }
+                        })
+                        .text(function(d) { 
+                            return Math.round(+d.value * 1000) / 1000000000 + "M€";});
 
-                    //ToDo : - valeur moyenne des joueurs ou valeur totale de chaque type ?
-                    //       - noms des postes
+                    svg.append("text")
+                        .attr("x", 290)             
+                        .attr("y", -100)
+                        .attr("text-anchor", "middle")  
+                        .style("font-size", "22px") 
+                        .style("font-weight", "bold") 
+                        .text(Object.keys(this.data)[0].charAt(0).toUpperCase() + Object.keys(this.data)[0].slice(1));
+
+                    svg.append("text")
+                        .attr("x", 290)             
+                        .attr("y", -75)
+                        .attr("text-anchor", "middle")  
+                        .style("font-size", "22px")
+                        .text(Math.round(+this.data[Object.keys(this.data)[0]]["totalValue"] * 1000) / 1000000000 + "M€");
+
+                    var legends = svg.append("g").attr("transform", "translate(240, -85)")
+                        .selectAll(".legends")
+                        .data(this.val)
+
+                    var legend = legends.enter()
+                        .append("g")
+                        .classed("legends", true)
+                        .attr("transform", function(d,i) {
+                            return "translate(0," + (i+1) * 30 + ")";
+                        });
+
+                    legend.append("rect")
+                        .attr("width", 20)
+                        .attr("height", 20)
+                        .attr("fill", function(d, i) { return color(i); });
+
+                    legend.append("text").text(function(d) { return d.role})
+                        .attr("fill", "black")
+                        .attr("x", 23)
+                        .attr("y", 15);
                     
                 }
 
