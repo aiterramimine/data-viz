@@ -241,9 +241,9 @@
 
                     d3.select("#pie").remove();
                     
-                    const width = 500;
+                    const width = 1000;
                     const height = 500;
-                    const radius = Math.min(width, height) / 2;
+                    const radius = Math.min(width/2, height) / 2;
 
                     const svg = d3.select("#pie-chart")
                         .append("svg")
@@ -251,7 +251,7 @@
                             .attr("height", height)
                             .attr("id", "pie")
                         .append("g")
-                            .attr("transform", `translate(${width / 2}, ${height / 2})`);
+                            .attr("transform", `translate(${width / 4}, ${height / 2})`);
 
                     const color = d3.scaleOrdinal(d3.schemeCategory10);
 
@@ -284,7 +284,29 @@
                         .attr("stroke-width", "6px")
                         .each(function(d) { this._current = d; });
 
+                    var legends = svg.append("g").attr("transform", "translate(290, -85)")
+                        .selectAll(".legends")
+                        .data(this.val)
 
+                    var legend = legends.enter()
+                        .append("g")
+                        .classed("legends", true)
+                        .attr("transform", function(d,i) {
+                            return "translate(0," + (i+1) * 30 + ")";
+                        });
+
+                    legend.append("rect")
+                        .attr("width", 20)
+                        .attr("height", 20)
+                        .attr("fill", function(d, i) { return color(i); });
+
+                    legend.append("text").text(function(d) { return d.role})
+                        .attr("fill", "black")
+                        .attr("x", 23)
+                        .attr("y", 15);
+
+
+                    
                     //ToDo : - valeur moyenne des joueurs ou valeur totale de chaque type ?
                     //       - noms des postes
                     
