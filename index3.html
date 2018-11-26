@@ -2,34 +2,22 @@
 <html lang="fr">
     <head>
         <link rel="stylesheet" type="text/css" href="style.css">
-        <script src = "https://d3js.org/d3.v4.min.js"></script>
+        <script src="https://d3js.org/d3.v4.min.js"></script>
     </head>
 
     <body>
     <div>
-        <p>Visualisation par Postes du football</p>
-        <h3 id="team"></h3>
-        <p>Schémas tactiques</p>
-        <form id="tactiques">
-            <input type="radio" id="4-4-2" name="formation" checked>4-4-2
-            <input type="radio" id="4-3-3" name="formation" disabled>4-3-3
-            <input type="radio" id="4-5-1" name="formation" disabled>4-5-1
-            <input type="radio" id="5-3-2" name="formation" disabled>5-3-2
-            <input type="radio" id="3-5-2" name="formation" disabled>3-5-2
-            <input type="radio" id="5-4-1" name="formation" disabled>5-4-1
-        </form>
-        <div id="chooseTactique"></div>
-
-        <p>Choix Equipe</p>
         <div id="choose"></div>
-        <svg id="position" width="100%" height="760"></svg>
         <svg id="graph"></svg>
+        <svg id="result"></svg>
+
     </div>
     </body>
 
     <script>
-        var dataset = "./datasets/euro2016_players_dataset.json";
-        var tactique = "";
+        const datasetEURO = "./datasets/euro2016_players_dataset.json";
+        const datasetFIFA = "./datasets/countries.json";
+/*        var tactique = "";
 
         var form = document.getElementById("tactiques");
 
@@ -38,15 +26,15 @@
                 .attr("xlink:href", "./img/terrain.svg")
                 .attr("x", 0)
                 .attr("y", 0)
-                .attr("width", 500)
-                .attr("height", 700)
+                .attr("width", 250)
+                .attr("height", 350)
                 .attr("fill", "#1b5e20")
                 .attr("stroke", "#fff")
                 .attr("stroke-width", 2);
         };
 
-        d3.json(dataset, function (data) {
-            d3.json("./datasets/fifa18dataset.json", function (data2) {
+        d3.json(datasetEURO, function (data) {
+            d3.json(datasetFIFA, function (data2) {
                 console.log("[TAILLE] "+data2.length);
                 for (let i = 0; i < data2.length; i++) {
                     let n = "Ramazan Özcan";
@@ -56,247 +44,321 @@
                     }
                 }
 
-            var tabData = ["-- Selection pays --"];
-            var tabDataTactic = ["4-3-3"];
-            tabDataTactic.push("Coucou");
-            tabDataTactic.push("Coucou1");
-            tabDataTactic.push("Coucou2");
+                var tabData = ["-- Selection pays --"];
 
-            for (var i = 0; i < data.length; i++) {
-                var object = data[i];
-                for (var obj in object) {
-                    tabData.push(obj);
-                }
-            }
-
-            var checkBox = d3.select("#tactiques")
-                .on("change", onChange);
-
-            var select = d3.select("#choose")
-                .append('select')
-                .attr('class', 'select')
-                .on('change', onChange);
-
-            var options = select.selectAll('option')
-                .data(tabData)
-                .enter()
-                .append('option')
-                .text(function (d) {
-                    return d;
-                });
-
-            function onChange() {
-                var listGoalkeeper = [];
-                for (var i = 0; i < form.length; i++) {
-                    if (form[i].checked) {
-                        tactique = form[i].id;
+                for (var i = 0; i < data.length; i++) {
+                    var object = data[i];
+                    for (var obj in object) {
+                        tabData.push(obj);
                     }
                 }
-                console.log("tactique = "+tactique);
 
-                selectValue = d3.select('select').property('value');
-                d3.selectAll('text').remove();
-                d3.selectAll('image').remove();
-                if (selectValue !== "-- Selection pays --" ) {
-                    d3.select('body').select('#team').text(selectValue);
-                    initTerrain();
+                var checkBox = d3.select("#tactiques")
+                    .on("change", onChange);
 
-                    for (var i = 0; i < data.length; i++) {
-                        var object = data[i];
-                        for (var obj in object) {
-                            if (obj === selectValue) {
-                                for (var j = 0; j < object[obj].Players.length; j++) {
-                                    console.log("========> "+object[obj].Players[j].position);
-                                    switch (object[obj].Players[j].position) {
-                                        case "Goalkeeper":
-                                            var ooo = object[obj].Players[j];
-                                            listGoalkeeper.push(ooo);
-                                            console.log("////////"+JSON.stringify(ooo));
-                                            var z = d3.scaleOrdinal()
-                                                .range(["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00"]);
+                var select = d3.select("#choose")
+                    .append('select')
+                    .attr('class', 'select')
+                    .on('change', onChange);
 
-                                            d3.select("#position").append("image")
-                                                .attr("xlink:href", "./img/goalkeeper.svg")
-                                                .attr("x", 225)
-                                                .attr("y", 630)
-                                                .attr("width", 50)
-                                                .attr("height", 50)
-                                                .on("click", function () {
-                                                    d3.select("#position").append("svg")
-                                                        .attr("id", "details")
-                                                        .append("rect")
-                                                        .attr("x", 500)
-                                                        .attr("y", 0)
-                                                        .attr("width", 500)
-                                                        .attr("height", 700)
-                                                        .style("opacity", 0.9)
-                                                        .style("stroke", "black")
-                                                        .style("fill", "white")
-                                                        .style("stroke-width", 1);
-                                                    for (let k = 0; k < listGoalkeeper.length; k++) {
-                                                        console.log("[GOALKEEPER] "+listGoalkeeper[k].name);
+                var options = select.selectAll('option')
+                    .data(tabData)
+                    .enter()
+                    .append('option')
+                    .text(function (d) {
+                        return d;
+                    });
 
-                                                        d3.select("#position").append("text")
-                                                            .attr('x', 500 + 10)
-                                                            .attr('y', 10*((k*2)+5))
-                                                            .attr('dy','0.35em')
-                                                            .attr("fill", "red")
-                                                            .attr("font-size", "20px")
-                                                            .text("--->"+listGoalkeeper[k].name + " --- " + listGoalkeeper[k].caps);
-                                                    }
+                function onChange() {
+                    var listGoalkeeper = [];
+                    for (var i = 0; i < form.length; i++) {
+                        if (form[i].checked) {
+                            tactique = form[i].id;
+                        }
+                    }
+                    console.log("[TACTIQUE] : "+tactique);
 
-                                                    var x0 = d3.scaleBand().rangeRound([0, 1000]).paddingInner(0.1);
-                                                    var x1 = d3.scaleBand().padding(0.05);
-                                                    var y = d3.scaleLinear().rangeRound([700, 0]);
+                    selectValue = d3.select('select').property('value');
+                    d3.selectAll('text').remove();
+                    d3.selectAll('image').remove();
+                    if (selectValue !== "-- Selection pays --" ) {
+                        d3.select('body').select('#team').text(selectValue);
+                        initTerrain();
 
-                                                    x0.domain(dataset)
+                        for (var i = 0; i < data.length; i++) {
+                            var object = data[i];
+                            for (var obj in object) {
+                                if (obj === selectValue) {
+                                    for (var j = 0; j < object[obj].Players.length; j++) {
+                                        console.log("[POSITION] : "+object[obj].Players[j].position);
+                                        switch (object[obj].Players[j].position) {
+                                            case "Goalkeeper":
+                                                var ooo = object[obj].Players[j];
+                                                var jsonObj = [];
 
-                                                    d3.select("#position").append("g").selectAll("ooo")
-                                                })
-                                                .on("mouseover", function () {
-                                                    var xPosition = 50 + 225;
-                                                    var yPosition = 10 + 630;
-                                                    console.log("Goalkeeper ----->"+xPosition+"  -- "+yPosition);
-                                                    d3.select("#position").append("svg")
-                                                        .attr("id", "info")
-                                                        .append("rect")
-                                                        .attr("rx", 10)
-                                                        .attr("ry", 10)
-                                                        .attr("x", xPosition)
-                                                        .attr("y", yPosition - 100)
-                                                        .attr("width", 100)
-                                                        .attr("height", 100)
-                                                        .style("opacity", 0.9)
-                                                        .style("stroke", "black")
-                                                        .style("fill", "white")
-                                                        .style("stroke-width", 1);
-                                                    d3.select("svg#info").append("text")
-                                                        .attr('x', xPosition)
-                                                        .attr('y', yPosition)
-                                                        .attr('dy','0.35em')
-                                                        .attr("fill", "red")
-                                                        .attr("font-size", "20px")
-                                                        .text("Coucou");
-                                                })
-                                                .on("mouseout", function () {
-                                                    console.log("Goalkeeper <-----");
-                                                    d3.selectAll('svg#info').remove();
-                                                });
-                                            break;
-                                        case "Defender":
-                                            d3.select("#position").append("image")
-                                                .attr("xlink:href", "./img/defender.svg")
-                                                .attr("x", 40)
-                                                .attr("y", 500)
-                                                .attr("width", 50)
-                                                .attr("height", 50)
-                                                .on("click", function () {
-                                                    console.log("Defender");
-                                                });
-                                            d3.select("#position").append("image")
-                                                .attr("xlink:href", "./img/defender.svg")
-                                                .attr("x", 150)
-                                                .attr("y", 530)
-                                                .attr("width", 50)
-                                                .attr("height", 50)
-                                                .on("click", function () {
-                                                    console.log("Defender");
-                                                });
-                                            d3.select("#position").append("image")
-                                                .attr("xlink:href", "./img/defender.svg")
-                                                .attr("x", 300)
-                                                .attr("y", 530)
-                                                .attr("width", 50)
-                                                .attr("height", 50)
-                                                .on("click", function () {
-                                                    console.log("Defender");
-                                                });
-                                            d3.select("#position").append("image")
-                                                .attr("xlink:href", "./img/defender.svg")
-                                                .attr("x", 420)
-                                                .attr("y", 500)
-                                                .attr("width", 50)
-                                                .attr("height", 50)
-                                                .on("click", function () {
-                                                    console.log("Defender");
-                                                });
-                                            break;
-                                        case "Midfielder":
-                                            d3.select("#position").append("image")
-                                                .attr("xlink:href", "./img/midfielder.svg")
-                                                .attr("x", 40)
-                                                .attr("y", 280)
-                                                .attr("width", 50)
-                                                .attr("height", 50)
-                                                .on("click", function () {
-                                                    console.log("Midfielder");
-                                                });
-                                            d3.select("#position").append("image")
-                                                .attr("xlink:href", "./img/midfielder.svg")
-                                                .attr("x", 150)
-                                                .attr("y", 370)
-                                                .attr("width", 50)
-                                                .attr("height", 50)
-                                                .on("click", function () {
-                                                    console.log("Midfielder");
-                                                });
-                                            d3.select("#position").append("image")
-                                                .attr("xlink:href", "./img/midfielder.svg")
-                                                .attr("x", 300)
-                                                .attr("y", 370)
-                                                .attr("width", 50)
-                                                .attr("height", 50)
-                                                .on("click", function () {
-                                                    console.log("Midfielder");
-                                                });
-                                            d3.select("#position").append("image")
-                                                .attr("xlink:href", "./img/midfielder.svg")
-                                                .attr("x", 420)
-                                                .attr("y", 280)
-                                                .attr("width", 50)
-                                                .attr("height", 50)
-                                                .on("click", function () {
-                                                    console.log("Midfielder");
-                                                });
-                                            break;
-                                        case "Forward":
-                                            d3.select("#position").append("image")
-                                                .attr("xlink:href", "./img/forward.svg")
-                                                .attr("x", 150)
-                                                .attr("y", 150)
-                                                .attr("width", 50)
-                                                .attr("height", 50)
-                                                .on("click", function () {
-                                                    console.log("Forward");
-                                                });
-                                            d3.select("#position").append("image")
-                                                .attr("xlink:href", "./img/forward.svg")
-                                                .attr("x", 300)
-                                                .attr("y", 150)
-                                                .attr("width", 50)
-                                                .attr("height", 50)
-                                                .on("click", function () {
-                                                    console.log("Forward");
-                                                });
-                                            break;
-                                        default:
-                                            console.log("Pas de poste remplacant");
+                                                listGoalkeeper.push(ooo);
+
+                                                d3.select("#position").append("image")
+                                                    .attr("xlink:href", "./img/goalkeeper.svg")
+                                                    .attr("x", 112.5)
+                                                    .attr("y", 315)
+                                                    .attr("width", 25)
+                                                    .attr("height", 25)
+                                                    .on("click", function () {
+                                                        d3.select("#position").append("svg")
+                                                            .attr("id", "details")
+                                                            .append("rect")
+                                                            .attr("x", 250)
+                                                            .attr("y", 0)
+                                                            .attr("width", 500)
+                                                            .attr("height", 700)
+                                                            .style("opacity", 0.9)
+                                                            .style("stroke", "black")
+                                                            .style("fill", "white")
+                                                            .style("stroke-width", 1);
+                                                        for (let k = 0; k < listGoalkeeper.length; k++) {
+                                                            console.log("[GOALKEEPER] "+listGoalkeeper[k].name);
+                                                            let n = listGoalkeeper[k].name;
+                                                            for (let i = 0; i < data2.length; i++) {
+                                                                let a = n.split(" ")[0];
+                                                                if (data2[i].Name === n.replace(a, a.split("")[0]+".")) {
+                                                                    d3.select("#position").append("text")
+                                                                        .attr('x', 250 + 10)
+                                                                        .attr('y', 10*((k*2)+5))
+                                                                        .attr('dy','0.35em')
+                                                                        .attr("fill", "red")
+                                                                        .attr("font-size", "20px")
+                                                                        .text(listGoalkeeper[k].name + " --- " + data2[i].Value);
+
+                                                                    let myNewObj;
+                                                                    myNewObj = {
+                                                                        "NAME": data2[i].Name,
+                                                                        "VALUES": [
+                                                                            {
+                                                                                "VALUE": data2[i].Value,
+                                                                                "TITLE": "Salaire"
+                                                                            }
+                                                                        ]
+                                                                    };
+                                                                    jsonObj.push(myNewObj);
+                                                                }
+                                                            }
+                                                        }
+                                                        console.log("[LIST] : "+JSON.stringify(jsonObj));
+
+                                                        d3.select("#position").append("g").selectAll("jsonObj");
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                        * LEGEND
+                                                        var legend = d3.select("#position")
+                                                            .append("g")
+                                                            .selectAll(".legend")
+                                                            .data(jsonObj[0].VALUES.map(function (d) {
+                                                                return d.TITLE;
+                                                            }).reverse())
+                                                            .attr("class", "legend")
+                                                            .attr("transform", function (d, i) {
+                                                                return "translate(0," + i * 20 + ")";
+                                                            })
+                                                            .style("opacity", "0");
+
+                                                        legend.append("rect")
+                                                            .attr('x', 1000)
+                                                            .attr("width", 18)
+                                                            .attr("height", 18)
+                                                            .style("fill", function (d) {
+                                                                return color(d);
+                                                            });
+                                                        legend.append("text")
+                                                            .attr("x", 1000)
+                                                            .attr("y", 9)
+                                                            .attr("dy", ".35em")
+                                                            .style("text-anchor", "end")
+                                                            .text(function (d) {
+                                                                return d;
+                                                            });
+                                                            *
+                                                    })
+                                                    .on("mouseover", function () {
+                                                        var xPosition = 25 + 112.5;
+                                                        var yPosition = 10 + 315;
+                                                        console.log("Goalkeeper ----->"+xPosition+"  -- "+yPosition);
+                                                        d3.select("#position").append("svg")
+                                                            .attr("id", "info")
+                                                            .append("rect")
+                                                            .attr("rx", 10)
+                                                            .attr("ry", 10)
+                                                            .attr("x", xPosition)
+                                                            .attr("y", yPosition - 100)
+                                                            .attr("width", 100)
+                                                            .attr("height", 100)
+                                                            .style("opacity", 0.9)
+                                                            .style("stroke", "black")
+                                                            .style("fill", "white")
+                                                            .style("stroke-width", 1);
+                                                        for (let k = 0; k < listGoalkeeper.length; k++) {
+                                                            console.log("[GOALKEEPER] "+listGoalkeeper[0].name);
+                                                            let n = listGoalkeeper[0].name;
+                                                            for (let i = 0; i < data2.length; i++) {
+                                                                let a = n.split(" ")[0];
+                                                                if (data2[i].Name === n.replace(a, a.split("")[0]+".")) {
+                                                                    d3.select("#position").append("text")
+                                                                        .attr('x', xPosition + 10)
+                                                                        .attr('y', yPosition*((k*2)+5))
+                                                                        .attr('dy','0.35em')
+                                                                        .attr("fill", "red")
+                                                                        .attr("font-size", "20px")
+                                                                        .text('data2[i].Name + " --- " + data2[i].Value');
+                                                                    console.log("[---] "+data2[i].Name);
+                                                                    let myNewObj;
+                                                                    myNewObj = {
+                                                                        "NAME": data2[i].Name,
+                                                                        "VALUES": [
+                                                                            {
+                                                                                "VALUE": data2[i].Value,
+                                                                                "TITLE": "Salaire"
+                                                                            }
+                                                                        ]
+                                                                    };
+                                                                    jsonObj.push(myNewObj);
+                                                                }
+                                                            }
+                                                        }
+                                                    })
+                                                    .on("mouseout", function () {
+                                                        console.log("Goalkeeper <-----");
+                                                        d3.selectAll('svg#info').remove();
+                                                    });
+                                                break;
+                                            case "Defender":
+                                                d3.select("#position").append("image")
+                                                    .attr("xlink:href", "./img/defender.svg")
+                                                    .attr("x", 20)
+                                                    .attr("y", 250)
+                                                    .attr("width", 25)
+                                                    .attr("height", 25)
+                                                    .on("click", function () {
+                                                        console.log("Defender");
+                                                    });
+                                                d3.select("#position").append("image")
+                                                    .attr("xlink:href", "./img/defender.svg")
+                                                    .attr("x", 75)
+                                                    .attr("y", 265)
+                                                    .attr("width", 25)
+                                                    .attr("height", 25)
+                                                    .on("click", function () {
+                                                        console.log("Defender");
+                                                    });
+                                                d3.select("#position").append("image")
+                                                    .attr("xlink:href", "./img/defender.svg")
+                                                    .attr("x", 150)
+                                                    .attr("y", 265)
+                                                    .attr("width", 25)
+                                                    .attr("height", 25)
+                                                    .on("click", function () {
+                                                        console.log("Defender");
+                                                    });
+                                                d3.select("#position").append("image")
+                                                    .attr("xlink:href", "./img/defender.svg")
+                                                    .attr("x", 210)
+                                                    .attr("y", 250)
+                                                    .attr("width", 25)
+                                                    .attr("height", 25)
+                                                    .on("click", function () {
+                                                        console.log("Defender");
+                                                    });
+                                                break;
+                                            case "Midfielder":
+                                                d3.select("#position").append("image")
+                                                    .attr("xlink:href", "./img/midfielder.svg")
+                                                    .attr("x", 20)
+                                                    .attr("y", 140)
+                                                    .attr("width", 25)
+                                                    .attr("height", 25)
+                                                    .on("click", function () {
+                                                        console.log("Midfielder");
+                                                    });
+                                                d3.select("#position").append("image")
+                                                    .attr("xlink:href", "./img/midfielder.svg")
+                                                    .attr("x", 150)
+                                                    .attr("y", 185)
+                                                    .attr("width", 25)
+                                                    .attr("height", 25)
+                                                    .on("click", function () {
+                                                        console.log("Midfielder");
+                                                    });
+                                                d3.select("#position").append("image")
+                                                    .attr("xlink:href", "./img/midfielder.svg")
+                                                    .attr("x", 75)
+                                                    .attr("y", 185)
+                                                    .attr("width", 25)
+                                                    .attr("height", 25)
+                                                    .on("click", function () {
+                                                        console.log("Midfielder");
+                                                    });
+                                                d3.select("#position").append("image")
+                                                    .attr("xlink:href", "./img/midfielder.svg")
+                                                    .attr("x", 210)
+                                                    .attr("y", 140)
+                                                    .attr("width", 25)
+                                                    .attr("height", 25)
+                                                    .on("click", function () {
+                                                        console.log("Midfielder");
+                                                    });
+                                                break;
+                                            case "Forward":
+                                                d3.select("#position").append("image")
+                                                    .attr("xlink:href", "./img/forward.svg")
+                                                    .attr("x", 80)
+                                                    .attr("y", 75)
+                                                    .attr("width", 25)
+                                                    .attr("height", 25)
+                                                    .on("click", function () {
+                                                        console.log("Forward");
+                                                    });
+                                                d3.select("#position").append("image")
+                                                    .attr("xlink:href", "./img/forward.svg")
+                                                    .attr("x", 150)
+                                                    .attr("y", 75)
+                                                    .attr("width", 25)
+                                                    .attr("height", 25)
+                                                    .on("click", function () {
+                                                        console.log("Forward");
+                                                    });
+                                                break;
+                                            default:
+                                                console.log("Pas de poste remplacant");
+                                        }
                                     }
                                 }
                             }
                         }
+
+                    } else {
+                        d3.select('body').select('#team').text("Selectionne un pays");
+                        d3.selectAll("svg > *").remove();
                     }
-
-                } else {
-                    d3.select('body').select('#team').text("Selectionne un pays");
-                    d3.selectAll("svg > *").remove();
                 }
-            }
-        });});
-
+            });
+        });
+*/
         document.addEventListener("DOMContentLoaded", () => {
-            d3.json("./datasets/euro2016_players_dataset.json", function (dataEuro) {
-                d3.json("./datasets/fifa18dataset.json", function (dataFifa) {
+            d3.json(datasetEURO, function (dataEuro) {
+                d3.json(datasetFIFA, function (dataFifa) {
+                    console.log("[START]");
                     const dataViz = new DataViz("graph", dataEuro, dataFifa, 1000, 1000);
                     dataViz.draw();
                 })
@@ -311,9 +373,171 @@
                 this.width = width;
                 this.height = height;
                 this.svg = d3.select(id).attr("width", this.width).attr("height", this.height);
+                this.tabData = ["-- Selection pays --"];
+                this.selectValue = "-- Selection pays --";
+                this.dataGoals;
+                this.dataDefs;
+                this.dataMids;
+                this.dataFors;
             }
 
             draw() {
+                for (var i = 0; i < this.datasetEuro.length; i++) {
+                    var object = this.datasetEuro[i];
+                    for (var obj in object) {
+                        this.tabData.push(obj);
+                    }
+                }
+
+                console.log("[TAILLE data FIFA] "+this.datasetEuro.length);
+                console.log("[TAILLE data EURO] "+this.datasetEuro.length);
+
+                for (let i = 0; i < this.datasetFifa.length; i++) {
+                    let n = "Ramazan Özcan";
+                    let a = n.split(" ")[0];
+                    if (this.datasetFifa[i].Name === n.replace(a, a.split("")[0]+".")) {
+                        console.log("[TROUVE-->] "+this.datasetFifa[i].Name);
+                    }
+                }
+
+
+
+                // CHOOSER
+                var select = d3.select("#choose")
+                    .append('select')
+                    .attr('class', 'select')
+                    .on('change', this.onChange.bind(this, this.datasetEuro, this.datasetFifa));
+
+                var options = select.selectAll('option')
+                    .data(this.tabData)
+                    .enter()
+                    .append('option')
+                    .text(function (d) {
+                        return d;
+                    });
+            }
+
+            onChange(dataE, dataF) {
+                this.selectValue = d3.select('select').property('value');
+                d3.selectAll('text').remove();
+                d3.selectAll('image').remove();
+
+                var goalkeepers = [];
+                var defenders = [];
+                var midfielders = [];
+                var forwards = [];
+                this.dataGoals = [];
+                this.dataDefs = [];
+                this.dataMids = [];
+                this.dataFors = [];
+
+                if (this.selectValue !== "-- Selection pays --" ) {
+                    for (var i = 0; i < dataE.length; i++) {
+                        var object = dataE[i];
+                        for (var obj in object) {
+                            if (obj === this.selectValue) {
+                                for (var j = 0; j < object[obj].Players.length; j++) {
+                                    let n;
+                                    let dnais;
+                                    switch (object[obj].Players[j].position) {
+                                        case "Goalkeeper":
+                                            var ooo = object[obj].Players[j];
+                                            goalkeepers.push(ooo);
+                                            for (let k = 0; k < goalkeepers.length; k++) {
+                                                n = goalkeepers[k].name;
+                                                dnais = goalkeepers[k].caps;
+                                            }
+                                            var newObj = {
+                                                "NAME": n,
+                                                "dnais": dnais,
+                                            }
+                                            this.dataGoals.push(newObj);
+                                            console.log(dnais+"[Goalkeeper]"+n);
+                                            break;
+                                        case "Defender":
+                                            var ooo = object[obj].Players[j];
+                                            defenders.push(ooo)
+                                            for (let k = 0; k < defenders.length; k++) {
+                                                n = defenders[k].name;
+                                                dnais = defenders[k].caps;
+                                            }
+                                            console.log(dnais+"[Defender]"+n);
+                                            break;
+                                        case "Midfielder":
+                                            var ooo = object[obj].Players[j];
+                                            midfielders.push(ooo)
+                                            for (let k = 0; k < midfielders.length; k++) {
+                                                n = midfielders[k].name;
+                                                dnais = midfielders[k].caps;
+                                            }
+                                            console.log(dnais+"[Midfielder]"+n);
+                                            break;
+                                        case "Forward":
+                                            var ooo = object[obj].Players[j];
+                                            forwards.push(ooo)
+                                            for (let k = 0; k < forwards.length; k++) {
+                                                n = forwards[k].name;
+                                                dnais = forwards[k].caps;
+                                            }
+                                            console.log(dnais+"[Forward]"+n);
+                                            break;
+                                        default:
+                                            console.log("Pas de poste remplacant");
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                } else {
+                    d3.select('body').select('#team').text("Selectionne un pays");
+                    d3.selectAll("svg > *").remove();
+                }
+
+                console.log("@@@@@@ "+this.dataGoals);
+
+                new Show().draw(this.dataGoals);
+
+            }
+
+        }
+
+        class Show {
+            constructor() {
+                this.data = null;
+                this.tactique = "4-4-2";
+            }
+
+            draw(data1, data2, data3, data4) {
+                d3.select("#ter").remove();
+                const width = 250;
+                const height = 350;
+
+                let svg = d3.select("svg"),
+                    margin = {top: 20, right: 20, bottom: 30, left: 40},
+                    g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+                var x = d3.scaleBand()
+                    .rangeRound([0, width])
+                    .padding(0.1);
+
+                var y = d3.scaleLinear()
+                    .rangeRound([height, 0]);
+
+                var bandScale = d3.scaleBand()
+                    .range([0, 200])
+                    .paddingInner(0.05);
+
+                d3.select("#result")
+                    .data(data1)
+                    .enter()
+                    .append('rect')
+                    .attr("y", function (d) {
+                        return bandScale(d.NAME);
+                    })
+                    .attr("width", function (d) {
+                        return d.dnais;
+                    });
 
             }
         }
