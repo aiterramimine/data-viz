@@ -13,11 +13,11 @@
     
         .bar:hover {
           fill: brown;
+          cursor: pointer;
         }
 
         .d3-tip {
             line-height: 1;
-            font-weight: bold;
             padding: 12px;
             background: rgba(0, 0, 0, 0.8);
             color: #fff;
@@ -52,19 +52,19 @@
 
             document.addEventListener("DOMContentLoaded", () => {
                 const histo = new Histogram("#test", "./datasets/euro2016_players_dataset.json", "./datasets/fifa18dataset.json", 1400, 500);
-                histo.draw();    
-                let pie = new PieChart();
-                pie.draw();            
+                histo.draw()
+                   
             });
 
             class Histogram {
 
-                constructor(id, datasetEuro, datasetFifa, width, height) {
+                constructor(id, datasetEuro, datasetFifa, width, height, pie) {
                     this.datasetEuro = datasetEuro
                     this.datasetFifa = datasetFifa
                     this.id = id
                     this.width = width
                     this.height = height
+                    this.pie = new PieChart()
                     this.svg = d3.select(this.id).attr("width", this.width).attr("height", this.height)
                     
                     // The countries array is filled with null and will be later filled with the teams according to their rank
@@ -94,6 +94,8 @@
 
                     let y = d3.scaleLinear()
                         .rangeRound([height, 0]);
+
+                    let t = this;
 
                     var tip = d3.tip()
                         .attr('class', 'd3-tip')
@@ -206,6 +208,9 @@
                                     return height - y(country[Object.keys(country)[0]]["totalValue"]);})
                                 .on('mouseover', tip.show)
                                 .on('mouseout', tip.hide)
+                                .on("click", function(d){
+                                    t.clickOnBar(d)
+                                });
 
                         })
                     })
@@ -219,6 +224,10 @@
                     }                    
                 }
 
+                clickOnBar(data) {
+                    console.log(Object.keys(data)[0])
+                }
+
             }
 
             class PieChart {
@@ -228,6 +237,7 @@
 
                 draw() {
                     if (this.data == null) return;
+                    console.log("draw")
                     const width = 540;
                     const height = 540;
                     const radius = Math.min(width, height) / 2;
@@ -256,7 +266,7 @@
                         return (t) => arc(i(t));
                     }
 
-                    /*
+                    
                     // Join new data
                     const path = svg.selectAll("path")
                         .data(pie(this.data[val]));
@@ -271,10 +281,11 @@
                         .attr("stroke", "white")
                         .attr("stroke-width", "6px")
                         .each(function(d) { this._current = d; });
-                    */
+                    
                 }
 
                 changeData(data) {
+                    console.log(data)
                     this.data = data;
                     this.draw();
                 }
