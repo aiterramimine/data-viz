@@ -303,6 +303,21 @@
                         .text(function(d) { 
                             return Math.round(+d.value * 1000) / 1000000000 + "M€";});
 
+                    svg.append("text")
+                        .attr("x", 340)             
+                        .attr("y", -100)
+                        .attr("text-anchor", "middle")  
+                        .style("font-size", "22px") 
+                        .style("font-weight", "bold") 
+                        .text(Object.keys(this.data)[0].charAt(0).toUpperCase() + Object.keys(this.data)[0].slice(1));
+
+                    svg.append("text")
+                        .attr("x", 340)             
+                        .attr("y", -75)
+                        .attr("text-anchor", "middle")  
+                        .style("font-size", "22px")
+                        .text(Math.round(+this.data[Object.keys(this.data)[0]]["totalValue"] * 1000) / 1000000000 + "M€");
+
                     var legends = svg.append("g").attr("transform", "translate(290, -85)")
                         .selectAll(".legends")
                         .data(this.val)
@@ -323,11 +338,6 @@
                         .attr("fill", "black")
                         .attr("x", 23)
                         .attr("y", 15);
-
-
-                    
-                    //ToDo : - valeur moyenne des joueurs ou valeur totale de chaque type ?
-                    //       - noms des postes
                     
                 }
 
