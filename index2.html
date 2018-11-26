@@ -10,6 +10,11 @@
         .bar {
           fill: steelblue;
         }
+
+        .side-bar {
+            text-align: center;
+            text-decoration: blueviolet;
+        }
     
         .bar:hover {
           fill: brown;
@@ -51,7 +56,6 @@
         <div id="side-bar">
             Select a country to visualize its players
         </div>
-        <div id="log-container"></div>
         <script type="text/javascript">
 
             document.addEventListener("DOMContentLoaded", () => {
@@ -234,6 +238,8 @@
                 }
 
                 clickOnBar(data) {
+                    this.pie.changeData(data)
+
                     console.log(data)
                     console.log(Object.keys(data)[0])
                     selectedCountry = Object.keys(data)[0]
@@ -294,27 +300,30 @@
             class PieChart {
                 constructor() {
                     this.data = null
+                    this.val = []
                 }
 
                 draw() {
                     if (this.data == null) return;
-                    console.log("draw")
-                    const width = 540;
-                    const height = 540;
-                    const radius = Math.min(width, height) / 2;
+
+                    d3.select("#pie").remove();
+                    
+                    const width = 1000;
+                    const height = 500;
+                    const radius = Math.min(width/2, height) / 2;
 
                     const svg = d3.select("#pie-chart")
                         .append("svg")
                             .attr("width", width)
                             .attr("height", height)
+                            .attr("id", "pie")
                         .append("g")
-                            .attr("transform", `translate(${width / 2}, ${height / 2})`);
+                            .attr("transform", `translate(${width / 4}, ${height / 2})`);
 
-                    const color = d3.scaleOrdinal(["#66c2a5","#fc8d62","#8da0cb",
-                        "#e78ac3","#a6d854","#ffd92f"]);
+                    const color = d3.scaleOrdinal(d3.schemeCategory10);
 
                     const pie = d3.pie()
-                        .value(d => d.count)
+                        .value(d => d.value)
                         .sort(null);
 
                     const arc = d3.arc()
@@ -327,27 +336,87 @@
                         return (t) => arc(i(t));
                     }
 
-                    
                     // Join new data
                     const path = svg.selectAll("path")
-                        .data(pie(this.data[val]));
+                        .data(pie(this.val));
 
                     // Update existing arcs
                     path.transition().duration(200).attrTween("d", arcTween);
 
                     // Enter new arcs
                     path.enter().append("path")
-                        .attr("fill", (d, i) => color(i))
+                        .attr("fill", function(d, i) { return color(i); })
                         .attr("d", arc)
                         .attr("stroke", "white")
                         .attr("stroke-width", "6px")
                         .each(function(d) { this._current = d; });
+
+                    path.enter().append("text")
+                        .attr("transform", function(d) { 
+                            return "translate(" + ( (radius - 12) * Math.sin( ((d.endAngle - d.startAngle) / 2) + d.startAngle ) / 2 ) + "," + ( -1 * (radius - 12) * Math.cos( ((d.endAngle - d.startAngle) / 2) + d.startAngle ) /2 ) + ")"; })
+                        .attr("dy", ".35em")
+                        .style("text-anchor", function(d) {
+                            var rads = ((d.endAngle - d.startAngle) / 2) + d.startAngle;
+                            if ( (rads > 7 * Math.PI / 4 && rads < Math.PI / 4) || (rads > 3 * Math.PI / 4 && rads < 5 * Math.PI / 4) ) {
+                                return "middle";
+                            } else if (rads >= Math.PI / 4 && rads <= 3 * Math.PI / 4) {
+                                return "start";
+                            } else if (rads >= 5 * Math.PI / 4 && rads <= 7 * Math.PI / 4) {
+                                return "end";
+                            } else {
+                                return "middle";
+                            }
+                        })
+                        .text(function(d) { 
+                            return Math.round(+d.value * 1000) / 1000000000 + "M€";});
+
+                    svg.append("text")
+                        .attr("x", 340)             
+                        .attr("y", -100)
+                        .attr("text-anchor", "middle")  
+                        .style("font-size", "22px") 
+                        .style("font-weight", "bold") 
+                        .text(Object.keys(this.data)[0].charAt(0).toUpperCase() + Object.keys(this.data)[0].slice(1));
+
+                    svg.append("text")
+                        .attr("x", 340)             
+                        .attr("y", -75)
+                        .attr("text-anchor", "middle")  
+                        .style("font-size", "22px")
+                        .text(Math.round(+this.data[Object.keys(this.data)[0]]["totalValue"] * 1000) / 1000000000 + "M€");
+
+                    var legends = svg.append("g").attr("transform", "translate(290, -85)")
+                        .selectAll(".legends")
+                        .data(this.val)
+
+                    var legend = legends.enter()
+                        .append("g")
+                        .classed("legends", true)
+                        .attr("transform", function(d,i) {
+                            return "translate(0," + (i+1) * 30 + ")";
+                        });
+
+                    legend.append("rect")
+                        .attr("width", 20)
+                        .attr("height", 20)
+                        .attr("fill", function(d, i) { return color(i); });
+
+                    legend.append("text").text(function(d) { return d.role})
+                        .attr("fill", "black")
+                        .attr("x", 23)
+                        .attr("y", 15);
                     
                 }
 
                 changeData(data) {
-                    console.log(data)
-                    this.data = data;
+
+                    this.data = data;                    
+                    this.val = []
+                    this.val.push({role: "Defenders", value: data[Object.keys(data)[0]]["valueDefenders"]})
+                    this.val.push({role: "Forwards", value: data[Object.keys(data)[0]]["valueForwards"]})
+                    this.val.push({role: "Goal keepers", value: data[Object.keys(data)[0]]["valueGoalkeepers"]})
+                    this.val.push({role: "Mid-fielders", value: data[Object.keys(data)[0]]["valueMidfielders"]})
+                    
                     this.draw();
                 }
             }
