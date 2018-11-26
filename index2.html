@@ -284,6 +284,25 @@
                         .attr("stroke-width", "6px")
                         .each(function(d) { this._current = d; });
 
+                    path.enter().append("text")
+                        .attr("transform", function(d) { 
+                            return "translate(" + ( (radius - 12) * Math.sin( ((d.endAngle - d.startAngle) / 2) + d.startAngle ) / 2 ) + "," + ( -1 * (radius - 12) * Math.cos( ((d.endAngle - d.startAngle) / 2) + d.startAngle ) /2 ) + ")"; })
+                        .attr("dy", ".35em")
+                        .style("text-anchor", function(d) {
+                            var rads = ((d.endAngle - d.startAngle) / 2) + d.startAngle;
+                            if ( (rads > 7 * Math.PI / 4 && rads < Math.PI / 4) || (rads > 3 * Math.PI / 4 && rads < 5 * Math.PI / 4) ) {
+                                return "middle";
+                            } else if (rads >= Math.PI / 4 && rads <= 3 * Math.PI / 4) {
+                                return "start";
+                            } else if (rads >= 5 * Math.PI / 4 && rads <= 7 * Math.PI / 4) {
+                                return "end";
+                            } else {
+                                return "middle";
+                            }
+                        })
+                        .text(function(d) { 
+                            return Math.round(+d.value * 1000) / 1000000000 + "M€";});
+
                     var legends = svg.append("g").attr("transform", "translate(290, -85)")
                         .selectAll(".legends")
                         .data(this.val)
