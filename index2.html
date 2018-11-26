@@ -48,6 +48,19 @@
             top: 100%;
             left: 0;
         }
+
+        #pie-chart {
+            position: absolute;
+            top: 410px;
+            width: 40%;
+            left: 10%;
+        }
+
+        #side-bar {
+            position: absolute;
+            width: 48%;
+            right: 1%;
+        }
     </style>
     <body>
 
@@ -59,7 +72,7 @@
         <script type="text/javascript">
 
             document.addEventListener("DOMContentLoaded", () => {
-                const histo = new Histogram("#test", "./datasets/euro2016_players_dataset.json", "./datasets/fifa18dataset.json", 1400, 500);
+                const histo = new Histogram("#test", "./datasets/euro2016_players_dataset.json", "./datasets/fifa18dataset.json", 1400, 400);
                 histo.draw()
                    
             });
@@ -87,7 +100,7 @@
 
                     let svg = d3.select("svg"),
                     margin = {
-                        top: 50,
+                        top: 40,
                         right: 20,
                         bottom: 30,
                         left: 150
@@ -308,8 +321,8 @@
 
                     d3.select("#pie").remove();
                     
-                    const width = 1000;
-                    const height = 500;
+                    const width = 700;
+                    const height = 350;
                     const radius = Math.min(width/2, height) / 2;
 
                     const svg = d3.select("#pie-chart")
@@ -371,7 +384,7 @@
                             return Math.round(+d.value * 1000) / 1000000000 + "M€";});
 
                     svg.append("text")
-                        .attr("x", 340)             
+                        .attr("x", 290)             
                         .attr("y", -100)
                         .attr("text-anchor", "middle")  
                         .style("font-size", "22px") 
@@ -379,13 +392,13 @@
                         .text(Object.keys(this.data)[0].charAt(0).toUpperCase() + Object.keys(this.data)[0].slice(1));
 
                     svg.append("text")
-                        .attr("x", 340)             
+                        .attr("x", 290)             
                         .attr("y", -75)
                         .attr("text-anchor", "middle")  
                         .style("font-size", "22px")
                         .text(Math.round(+this.data[Object.keys(this.data)[0]]["totalValue"] * 1000) / 1000000000 + "M€");
 
-                    var legends = svg.append("g").attr("transform", "translate(290, -85)")
+                    var legends = svg.append("g").attr("transform", "translate(240, -85)")
                         .selectAll(".legends")
                         .data(this.val)
 
