@@ -4,7 +4,7 @@
         <meta charset="utf-8">
         <title>D3 Test</title>
         <script src="https://d3js.org/d3.v5.js"></script>
-        <script src="https://d3js.org/d3-random.v1.min.js"></script>
+        <script src="d3-tip.js"></script>
     </head
     ><style>
         .bar {
@@ -14,15 +14,47 @@
         .bar:hover {
           fill: brown;
         }
+
+        .d3-tip {
+            line-height: 1;
+            font-weight: bold;
+            padding: 12px;
+            background: rgba(0, 0, 0, 0.8);
+            color: #fff;
+            border-radius: 2px;
+        }
+
+        /* Creates a small triangle extender for the tooltip */
+        .d3-tip:after {
+            box-sizing: border-box;
+            display: inline;
+            font-size: 10px;
+            width: 100%;
+            line-height: 1;
+            color: rgba(0, 0, 0, 0.8);
+            content: "\25BC";
+            position: absolute;
+            text-align: center;
+        }
+
+            /* Style northward tooltips differently */
+        .d3-tip.n:after {
+            margin: -1px 0 0 0;
+            top: 100%;
+            left: 0;
+        }
     </style>
     <body>
 
         <svg id="test"></svg>
+        <div id="pie-chart"></svg>
         <script type="text/javascript">
 
             document.addEventListener("DOMContentLoaded", () => {
                 const histo = new Histogram("#test", "./datasets/euro2016_players_dataset.json", "./datasets/fifa18dataset.json", 1400, 500);
-                histo.draw();                
+                histo.draw();    
+                let pie = new PieChart();
+                pie.draw();            
             });
 
             class Histogram {
@@ -45,7 +77,7 @@
 
                     let svg = d3.select("svg"),
                     margin = {
-                        top: 20,
+                        top: 50,
                         right: 20,
                         bottom: 30,
                         left: 150
@@ -63,6 +95,15 @@
                     let y = d3.scaleLinear()
                         .rangeRound([height, 0]);
 
+                    var tip = d3.tip()
+                        .attr('class', 'd3-tip')
+                        .offset([-10, 0])
+                        .html(function(d) {
+                            return "Total value : " + Math.round(+d[Object.keys(d)[0]]["totalValue"] * 1000) / 1000000000 + "M€";
+                        })
+                    g.call(tip);
+
+
                     // Retrieve the fifa dataset infos
                     d3.json(this.datasetFifa).then(fifaPlayers => {
                         //Retrieve the euro dataset infos
@@ -77,19 +118,22 @@
                                     country[countryName]["totalValue"] = 0
 
                                     this.countries[rank-1] = country
+                                    let i = 0;
 
                                     country[countryName]["Players"].forEach(player => {
                                         let researchName = player["name"].split(' ')[player["name"].split(' ').length - 1]
                                         //console.log(player["name"] + " | "+ researchName)
                                         
+                                        let found = false;
+                                        
                                         // Find the current player of the euro dataset in the fifa dataset
-                                        // ToDO : Enhance the search, for now it stops when finding a player with the same second name.
-                                        //        We should check if several players have the same second name, then choose which one to pick according to his first name and nationality if needed
                                         fifaPlayers.some(function(fifaPlayer) {
                                             if (fifaPlayer["Name"].split(' ')[fifaPlayer["Name"].split(' ').length - 1] === researchName  &&
                                                 fifaPlayer["Nationality"].toLowerCase() === countryName)
                                             {
                                                 let val = fifaPlayer["Value"].replace('€','')
+                                                
+                                                found = true
 
                                                 //The value always contains € at the beginning and M or K at the end
                                                 if (val.indexOf("M") > -1) {
@@ -100,11 +144,6 @@
                                                     val = parseInt(val) * 1000
                                                 } else {
                                                     //Do nothing
-                                                }
-
-                                                //ToDo : remove later, for test purpose only. Checks if a player has no value
-                                                if (val == 0) {
-                                                    console.log(player["name"])
                                                 }
 
                                                 // Add the player value to his team total value
@@ -121,10 +160,13 @@
                                                 return true;
                                             }
                                         })
+                                        
+                                        if (!found) {
+                                            console.log(player["name"])
+                                        }
                                     })
                                 }
                             })
-                            //console.log(this.countries)
 
                             x.domain(this.countries.map(function (d) {
                                 return Object.keys(d)[0]
@@ -132,7 +174,6 @@
 
 
                             y.domain([0, d3.max(this.countries, function (country) {
-                                console.log( country[Object.keys(country)[0]]["totalValue"])
                                 return country[Object.keys(country)[0]]["totalValue"]
                             })]);
 
@@ -162,21 +203,83 @@
                                 })
                                 .attr("width", x.bandwidth())
                                 .attr("height", function (country) {
-                                    return height - y(country[Object.keys(country)[0]]["totalValue"]);
-                            });
+                                    return height - y(country[Object.keys(country)[0]]["totalValue"]);})
+                                .on('mouseover', tip.show)
+                                .on('mouseout', tip.hide)
+
                         })
                     })
                 }
 
-                getPos(name) {
-                    let pos = [];
-                    let person = this.data.persons.find(p => p.name === name);
-                    pos.push(person.position.x);
-                    pos.push(person.position.y);
-                    return pos;      
+                getCountry(rank) {
+                    if (rank < 1 || rank > 16) {
+                        return null;
+                    } else {
+                        return this.countries[rank - 1];
+                    }                    
                 }
 
             }
+
+            class PieChart {
+                constructor() {
+                    this.data = null
+                }
+
+                draw() {
+                    if (this.data == null) return;
+                    const width = 540;
+                    const height = 540;
+                    const radius = Math.min(width, height) / 2;
+
+                    const svg = d3.select("#pie-chart")
+                        .append("svg")
+                            .attr("width", width)
+                            .attr("height", height)
+                        .append("g")
+                            .attr("transform", `translate(${width / 2}, ${height / 2})`);
+
+                    const color = d3.scaleOrdinal(["#66c2a5","#fc8d62","#8da0cb",
+                        "#e78ac3","#a6d854","#ffd92f"]);
+
+                    const pie = d3.pie()
+                        .value(d => d.count)
+                        .sort(null);
+
+                    const arc = d3.arc()
+                        .innerRadius(0)
+                        .outerRadius(radius);
+
+                    function arcTween(a) {
+                        const i = d3.interpolate(this._current, a);
+                        this._current = i(1);
+                        return (t) => arc(i(t));
+                    }
+
+                    /*
+                    // Join new data
+                    const path = svg.selectAll("path")
+                        .data(pie(this.data[val]));
+
+                    // Update existing arcs
+                    path.transition().duration(200).attrTween("d", arcTween);
+
+                    // Enter new arcs
+                    path.enter().append("path")
+                        .attr("fill", (d, i) => color(i))
+                        .attr("d", arc)
+                        .attr("stroke", "white")
+                        .attr("stroke-width", "6px")
+                        .each(function(d) { this._current = d; });
+                    */
+                }
+
+                changeData(data) {
+                    this.data = data;
+                    this.draw();
+                }
+            }
+            
 
         </script>
     </body>
