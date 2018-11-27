@@ -7,7 +7,7 @@
 
         <style>
             body {
-                overflow: hidden;
+                /*overflow: hidden;*/
                 margin: 0;
                 font-size: 14px;
                 font-family: "Helvetica Neue", Helvetica;
@@ -25,25 +25,215 @@
                 <a href="index.html">Index</a>
                 <a href="index2.html">Histogram</a>
             </div>
+
+            <div>
+
+            </div>
+
+            <div id="choose"></div>
     <div id="body">
         <div id="graph"></div>
-
+        <div id="graph1"></div>
+        <div id="graph2"></div>
+        <div id="graph3"></div>
     </div>
     </body>
 
     <script>
-        const datasetFIFA = "./datasets/fifa.json";
+        const datasetEURO = "./datasets/euro2016_players_dataset.json";
+        const datasetFIFA = "./datasets/fifa18dataset.json";
+
+        var tabData = ["-- Selection pays --"];
 
         document.addEventListener("DOMContentLoaded", () => {
-            d3.json(datasetFIFA, function (dataFifa) {
-                console.log("[START]");
-                const dataViz = new DataViz("#graph", dataFifa, 600, 600);
-                dataViz.draw();
+            d3.json(datasetEURO, function (dataEuro) {
+                d3.json(datasetFIFA, function (dataFifa) {
+                    console.log("[START]");
+
+                    /*for (var g = 0; g < dataEuro.length; g++) {
+                        for (var b = 0; b < dataFifa.length; b++) {
+                            var object = dataEuro[g];
+                            for (var obj in object) {
+                                console.log("[TROUVE]****** "+ (obj.charAt(0).toUpperCase() + obj.slice(1)) + " IN " + dataFifa[b].Nationality);
+                                //console.log("[TROUVE] "+(obj.charAt(0).toUpperCase() + obj.slice(1)));
+                                if ((obj.charAt(0).toUpperCase() + obj.slice(1)) === dataFifa[b].Nationality) {
+                                    console.log("[TROUVE] "+obj + " IN " + dataFifa[b].Nationality);
+                                }
+                            }
+
+                        }
+                    }*/
+
+
+                for (var i = 0; i < dataEuro.length; i++) {
+                    var object = dataEuro[i];
+                    // console.log("====>"+JSON.stringify(object, null, 2));
+                    for (var obj in object) {
+                        tabData.push(obj);
+                    }
+                }
+
+                /*dataFifa.forEach(joueur => {
+                    console.log("#########"+joueur);
+                });*/
+
+                var newDATA = [];
+
+
+                    for (var b = 0; b < tabData.length; b++) {
+                        for (var g = 0; g < dataFifa.length; g++) {
+                            /*let n = "Ramazan Özcan";
+                            let a = n.split(" ")[0];
+                            if (this.datasetFifa[i].Name === n.replace(a, a.split("")[0]+".")) {
+                                debugger;
+                                console.log("[TROUVE] "+this.datasetFifa[i].Name);
+                            }*/
+                            //console.log("====>"+tabData[g]);
+                            if ((tabData[b].charAt(0).toUpperCase() + tabData[b].slice(1)) === dataFifa[g].Nationality) {
+                                console.log((tabData[b].charAt(0).toUpperCase() + tabData[b].slice(1)) + "------"+ dataFifa[g].Nationality);
+                                newDATA.push(dataFifa[g]);
+                            }
+
+                        }
+                    }
+                    //console.log(JSON.stringify(newDATA, null, 2));
+                    console.log(newDATA.length);
+
+
+
+                //console.log("====>"+tabData);
+
+                // CHOOSER
+                var select = d3.select("#choose")
+                    .append('select')
+                    .attr('class', 'select')
+                    .on('change', this.onChange.bind(this, dataEuro, dataFifa));
+                var options = select.selectAll('option')
+                    .data(tabData)
+                    .enter()
+                    .append('option')
+                    .text(function (d) {
+                        return d;
+                    });
+
+            })
             })
         });
 
+
+
+
+        function onChange(dataE, dataF) {
+            this.selectValue = d3.select('select').property('value');
+            d3.selectAll('text').remove();
+            d3.selectAll('image').remove();
+
+            const dataViz = new DataViz("#graph", dataE, dataF, 600, 600);
+            dataViz.draw();
+
+            const dataViz1 = new DataViz("#graph1", dataE, dataF, 600, 600);
+            dataViz1.draw();
+
+            const dataViz2 = new DataViz("#graph2", dataE, dataF, 600, 600);
+            dataViz2.draw();
+
+            const dataViz3 = new DataViz("#graph3", dataE, dataF, 600, 600);
+            dataViz3.draw();
+
+            var goalkeepers = [];
+            var defenders = [];
+            var midfielders = [];
+            var forwards = [];
+            this.dataGoals = [];
+            this.dataDefs = [];
+            this.dataMids = [];
+            this.dataFors = [];
+            if (this.selectValue !== "-- Selection pays --" ) {
+                console.log("[PAYS]"+this.selectValue);
+                for (var i = 0; i < dataE.length; i++) {
+                    var object = dataE[i];
+                    for (var obj in object) {
+                        if (obj === this.selectValue) {
+                            for (var j = 0; j < object[obj].Players.length; j++) {
+                                let n;
+                                let dnais;
+                                switch (object[obj].Players[j].position) {
+                                    case "Goalkeeper":
+                                        var ooo = object[obj].Players[j];
+                                        goalkeepers.push(ooo);
+                                        for (let k = 0; k < goalkeepers.length; k++) {
+                                            n = goalkeepers[k].name;
+                                        }
+                                        var newObj = {"NAME": n};
+                                        this.dataGoals.push(newObj);
+                                        console.log("[GOALKEEPER]"+this.dataGoals);
+                                        break;
+                                    case "Defender":
+                                        var ooo = object[obj].Players[j];
+                                        defenders.push(ooo);
+                                        for (let k = 0; k < defenders.length; k++) {
+                                            console.log("[DEFENDER]"+defenders[k].name);
+                                        }
+                                        /*var ooo = object[obj].Players[j];
+                                        defenders.push(ooo)
+                                        for (let k = 0; k < defenders.length; k++) {
+                                            n = defenders[k].name;
+                                            dnais = defenders[k].caps;
+                                        }
+                                        console.log(dnais+"[Defender]"+n);*/
+                                        break;
+                                    case "Midfielder":
+                                        var ooo = object[obj].Players[j];
+                                        midfielders.push(ooo);
+                                        for (let k = 0; k < midfielders.length; k++) {
+                                            console.log("[MIDFIELDER]"+midfielders[k].name);
+                                        }
+                                        /*var ooo = object[obj].Players[j];
+                                        midfielders.push(ooo)
+                                        for (let k = 0; k < midfielders.length; k++) {
+                                            n = midfielders[k].name;
+                                            dnais = midfielders[k].caps;
+                                        }
+                                        console.log(dnais+"[Midfielder]"+n);*/
+                                        break;
+                                    case "Forward":
+                                        var ooo = object[obj].Players[j];
+                                        forwards.push(ooo);
+                                        for (let k = 0; k < forwards.length; k++) {
+                                            console.log("[FORWARD]"+forwards[k].name);
+                                        }
+                                        /*var ooo = object[obj].Players[j];
+                                        forwards.push(ooo)
+                                        for (let k = 0; k < forwards.length; k++) {
+                                            n = forwards[k].name;
+                                            dnais = forwards[k].caps;
+                                        }
+                                        console.log(dnais+"[Forward]"+n);*/
+                                        break;
+                                    default:
+                                        console.log("Pas de poste remplacant");
+                                }
+                            }
+                        }
+                    }
+                }
+            } else {
+                d3.select('body').select('#team').text("Selectionne un pays");
+                d3.selectAll("svg > *").remove();
+            }
+        }
+
+        /*document.addEventListener("DOMContentLoaded", () => {
+                d3.json(datasetFIFA, function (dataFifa) {
+                    console.log("[START]");
+                    const dataViz = new DataViz("#graph", dataFifa, 600, 600);
+                    dataViz.draw();
+                })
+        });*/
+
         class DataViz {
-            constructor(id, datasetFifa, width, height) {
+            constructor(id, datasetEuro, datasetFifa, width, height) {
+                this.datasetEuro = datasetEuro;
                 this.datasetFifa = datasetFifa;
                 this.id = id;
                 this.width = width;
@@ -58,19 +248,24 @@
 
                 for (var i = 0; i < this.datasetFifa.length; i++) {
                     this.listFiveFirst.push(this.datasetFifa[i].Name);
+                    
+                    /*for (let j = 0; j < this.datasetFifa.length; j++) {
+                        let n = "Ramazan Özcan";
+                        let a = n.split(" ")[0];
+                        if (this.datasetFifa[i].Name === n.replace(a, a.split("")[0]+".")) {
+                            debugger;
+                            console.log("[TROUVE] "+this.datasetFifa[i].Name);
+                        }
+                    }*/
+                    
                     obj1 = {"axe": "Acceleration", "value": this.datasetFifa[i].Acceleration /100};
                     obj2 = {"axe": "Aggression", "value": this.datasetFifa[i].Aggression/100};
                     obj3 = {"axe": "Agility", "value": this.datasetFifa[i].Agility/100};
                     obj4 = {"axe": "Balance", "value": this.datasetFifa[i].Balance/100};
                     obj5 = {"axe": "Crossing", "value": this.datasetFifa[i].Crossing/100};
                     obj6 = {"axe": "Dribbling", "value": this.datasetFifa[i].Dribbling/100};
-                    /*var object = this.datasetFifa[i];
-                    for (var obj in object) {
-                        this.tabData.push(obj);
-                    }*/
                     this.listFive.push(new Array(obj1, obj2, obj3, obj4, obj5, obj6));
                 }
-                //this.listFive.push(myObjects);
 
                 RadarChart.draw(this.id, this.listFive, {
                     w: this.width,
@@ -80,7 +275,7 @@
                     ExtraWidthX: 300
                 });
 
-                console.log("[TAILLE data FIFA] "+JSON.stringify(this.listFive, null, 2));
+                //console.log("[TAILLE data FIFA] "+JSON.stringify(this.listFive, null, 2));
 
 
 ////////////////////////////////////////////
