@@ -268,19 +268,31 @@
 
             function setUpSideBar(countryName, dataSet) {
             let bar = document.querySelector('#side-bar');
-            bar.innerHTML = countryName;
-            bar.style.backgroundColor = '#ed5050';
+            // bar.innerHTML = countryName;
+            bar.innerHTML = "";
             
             for(player of dataSet[countryName]['Players']) {
                 let percentage = (player["value"] * 100) / dataSet[countryName]['totalValue'];
-                console.log(player["name"] + " " + percentage)
-               let elem = document.createElement('div');
-               if(percentage > 0.1) elem.innerHTML = player['name'] + ' - ' + player['value'] + ' - ' + player['club'];
-               elem.style.height = percentage + "%";
-               elem.style.marginBottom = "1px";
-               elem.style.backgroundColor = "#37d693";
-               elem.style.color = "white"
-               bar.appendChild(elem);
+                //console.log(player["name"] + " " + percentage)
+                let elem = document.createElement('div');
+                if(player["position"] === "Forward") {                        
+                    elem.innerHTML = "<span style='color: #FF7F0E'> " +player['name'] + "</span>" + ' - ' + Math.round(+player['value'] * 1000) / 1000000 + "K€" + ' - ' + player['club'];
+                } else if(player["position"] === "Midfielder") {                        
+                    elem.innerHTML = "<span style='color: red'> " +player['name'] + "</span>" + ' - ' + Math.round(+player['value'] * 1000) / 1000000 + "K€" + ' - ' + player['club'];
+                } else if(player["position"] === "Defender") {                        
+                    elem.innerHTML = "<span style='color: blue'> " +player['name'] + "</span>" + ' - ' + Math.round(+player['value'] * 1000) / 1000000 + "K€" + ' - ' + player['club'];
+                } else {    
+                    console.log(player["Position"])                    
+                    elem.innerHTML = "<span style='color: #2CA02C'> " +player['name'] + "</span>" + ' - ' + Math.round(+player['value'] * 1000) / 1000000 + "K€" + ' - ' + player['club'];
+                }
+                console.log(percentage)
+                // elem.style.height = percentage + "%";
+                elem.style.height = "25px";
+                elem.style.marginBottom = "1px";
+                elem.style.backgroundColor = "white";
+                elem.style.color = "black"
+                elem.style.border = "1px solid grey"
+                bar.appendChild(elem);
             }
 
         }
