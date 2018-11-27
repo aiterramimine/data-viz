@@ -8,7 +8,7 @@
     </head
     ><style>
         .bar {
-          fill: #7b6888;
+          fill: steelblue;
         }
 
         .side-bar {
@@ -17,7 +17,7 @@
         }
     
         .bar:hover {
-          fill: rgb(126, 65, 126);
+          fill: brown;
           cursor: pointer;
         }
 
@@ -51,7 +51,6 @@
 
         #pie-chart {
             position: absolute;
-            top: 410px;
             width: 40%;
             left: 10%;
         }
@@ -63,6 +62,13 @@
         }
     </style>
     <body>
+        <div>
+            <a href="index.html">Index</a>
+            <a href="index3.html">Radar chart</a>
+        </div>
+
+        <h1>Répartition des valeurs par équipe ayant participé à l'Euro 2016</h1>
+
 
         <svg id="test"></svg>
         <div id="pie-chart"></div>
@@ -72,7 +78,7 @@
         <script type="text/javascript">
 
             document.addEventListener("DOMContentLoaded", () => {
-                const histo = new Histogram("#test", "./datasets/euro2016_players_dataset.json", "./datasets/fifa18dataset.json", 1400, 400);
+                const histo = new Histogram("#test", "./datasets/euro2016_players_dataset.json", "./datasets/fifa18dataset.json", 1400, 500);
                 histo.draw()
                    
             });
@@ -100,7 +106,7 @@
 
                     let svg = d3.select("svg"),
                     margin = {
-                        top: 40,
+                        top: 50,
                         right: 20,
                         bottom: 30,
                         left: 150
@@ -147,7 +153,6 @@
 
                                     country[countryName]["Players"].forEach(player => {
                                         let researchName = player["name"].split(' ')[player["name"].split(' ').length - 1]
-                                        //console.log(player["name"] + " | "+ researchName)
                                         
                                         let found = false;
                                         
@@ -174,8 +179,7 @@
                                                 // Add the player value to his team total value
                                                 country[countryName]["totalValue"] += val
                                                 
-                                                player["value"] = val
-                                                console.log(player)                  
+                                                player["value"] = val          
 
                                                 // Add the player value to the total of his category
                                                 let category = "value"+player["position"]+"s"
@@ -188,10 +192,6 @@
                                                 return true;
                                             }
                                         })
-                                        
-                                        if (!found) {
-                                            console.log(player["name"])
-                                        }
                                     })
                                 }
                             })
@@ -253,8 +253,6 @@
                 clickOnBar(data) {
                     this.pie.changeData(data)
 
-                    console.log(data)
-                    console.log(Object.keys(data)[0])
                     selectedCountry = Object.keys(data)[0]
                     if(selectedCountry){
                         d3.select(selectedCountry).style("stoke-width", '0px');
@@ -268,19 +266,25 @@
 
             function setUpSideBar(countryName, dataSet) {
             let bar = document.querySelector('#side-bar');
-            bar.innerHTML = countryName;
-            bar.style.backgroundColor = '#ed5050';
+            bar.innerHTML = "";
             
             for(player of dataSet[countryName]['Players']) {
-                let percentage = (player["value"] * 100) / dataSet[countryName]['totalValue'];
-                console.log(player["name"] + " " + percentage)
-               let elem = document.createElement('div');
-               if(percentage > 0.1) elem.innerHTML = player['name'] + ' - ' + player['value'] + ' - ' + player['club'];
-               elem.style.height = percentage + "%";
-               elem.style.marginBottom = "1px";
-               elem.style.backgroundColor = "#37d693";
-               elem.style.color = "white"
-               bar.appendChild(elem);
+                let elem = document.createElement('div');
+                if(player["position"] === "Forward") {                        
+                    elem.innerHTML = "<span style='color: #FF7F0E'> " +player['name'] + "</span>" + ' - ' + Math.round(+player['value'] * 1000) / 1000000 + "K€" + ' - ' + player['club'];
+                } else if(player["position"] === "Midfielder") {                        
+                    elem.innerHTML = "<span style='color: red'> " +player['name'] + "</span>" + ' - ' + Math.round(+player['value'] * 1000) / 1000000 + "K€" + ' - ' + player['club'];
+                } else if(player["position"] === "Defender") {                        
+                    elem.innerHTML = "<span style='color: blue'> " +player['name'] + "</span>" + ' - ' + Math.round(+player['value'] * 1000) / 1000000 + "K€" + ' - ' + player['club'];
+                } else {                       
+                    elem.innerHTML = "<span style='color: #2CA02C'> " +player['name'] + "</span>" + ' - ' + Math.round(+player['value'] * 1000) / 1000000 + "K€" + ' - ' + player['club'];
+                }
+                elem.style.height = "25px";
+                elem.style.marginBottom = "1px";
+                elem.style.backgroundColor = "white";
+                elem.style.color = "black"
+                elem.style.border = "1px solid grey"
+                bar.appendChild(elem);
             }
 
         }
@@ -290,13 +294,11 @@
             prices = [];
             for(element of dataSet) {
                 countryName = countryName.charAt(0).toLowerCase() + countryName.slice(1);
-                //console.log(Object.keys(element));
                 if(Object.keys(element) == countryName) {
                     ret = element[countryName].Players;
                 }
             }
             ret.sort((a, b) => b['price'] - a['price']);
-            //console.log(ret);
             totalGoalsPlayers(ret);
             return retx;
         }
@@ -321,8 +323,8 @@
 
                     d3.select("#pie").remove();
                     
-                    const width = 700;
-                    const height = 350;
+                    const width = 1000;
+                    const height = 500;
                     const radius = Math.min(width/2, height) / 2;
 
                     const svg = d3.select("#pie-chart")
@@ -384,7 +386,7 @@
                             return Math.round(+d.value * 1000) / 1000000000 + "M€";});
 
                     svg.append("text")
-                        .attr("x", 290)             
+                        .attr("x", 340)             
                         .attr("y", -100)
                         .attr("text-anchor", "middle")  
                         .style("font-size", "22px") 
@@ -392,13 +394,13 @@
                         .text(Object.keys(this.data)[0].charAt(0).toUpperCase() + Object.keys(this.data)[0].slice(1));
 
                     svg.append("text")
-                        .attr("x", 290)             
+                        .attr("x", 340)             
                         .attr("y", -75)
                         .attr("text-anchor", "middle")  
                         .style("font-size", "22px")
                         .text(Math.round(+this.data[Object.keys(this.data)[0]]["totalValue"] * 1000) / 1000000000 + "M€");
 
-                    var legends = svg.append("g").attr("transform", "translate(240, -85)")
+                    var legends = svg.append("g").attr("transform", "translate(290, -85)")
                         .selectAll(".legends")
                         .data(this.val)
 
